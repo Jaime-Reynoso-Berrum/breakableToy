@@ -33,4 +33,20 @@ public class todoService {
         if(priority != null){ currentItem.setPriority(priority);}
         if(dueDate != null){ currentItem.setDueDate(dueDate);}
     }
+
+    //marks the current todo item as completed/done
+    public Todo completeTodo(UUID id){
+        Todo currentItem = todoItems.get(id);
+        currentItem.setCompleted(true);
+        currentItem.setDoneDate(LocalDate.now());
+        return currentItem;
+    }
+
+    //undos an item from being marked as completed/done
+    public Todo undoCompleteTodo(UUID id){
+        Todo currentItem = todoItems.get(id);
+        currentItem.setCompleted(false);
+        currentItem.setDoneDate(null);
+        return currentItem;
+    }
 }
