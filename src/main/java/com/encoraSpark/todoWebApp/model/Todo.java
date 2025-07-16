@@ -6,11 +6,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public class Todo {
-    private UUID id;
 
     @Size (max=120, message = "To do item can not pass 120 characters")
     private String todoItem;
 
+    private UUID id;
     private int priority;
     private LocalDate creationDate;
     private LocalDate dueDate;
