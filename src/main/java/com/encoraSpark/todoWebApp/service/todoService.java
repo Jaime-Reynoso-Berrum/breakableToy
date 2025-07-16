@@ -9,12 +9,16 @@ import java.util.*;
 @Service
 public class todoService {
     private final Map<UUID, Todo> todoItems = new HashMap<>();
+    private String query;
+    private int priorityFilter;
+    private boolean completed;
+    private boolean ascending;
 
     //updates page with the current todo items
-    public void updateList(String query, int priority, boolean completed, boolean ascending){
+    public void updateList(String query, int priorityFilter, boolean completed, boolean ascending){
 
         //filters the list based on 3 parameters, and then sorts it
-        List<Todo> filteredList = filterTodos(query, priority, completed);
+        List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
         List<Todo> finalList = sortedTodos(filteredList, ascending);
 
 
@@ -81,18 +85,20 @@ public class todoService {
         Todo newItem = new Todo(todoItem, priority, dueDate);
         todoItems.put(newItem.getId(), newItem);
 
-        updateList();
+        grabFilterSortState();
+        updateList(query, priorityFilter, completed, ascending);
         return newItem;
     }
 
     //edits the current Todo object
-    public Todo editTodo(UUID id, String todoItem, int priority, LocalDate dueDate, Boolean delete){
+    public Todo editTodo(UUID id, String todoItem, int priority, LocalDate dueDate, boolean delete){
         Todo currentItem = todoItems.get(id);
 
         // deletes the current item from todoItems hashmap and the list
         if(delete){
             todoItems.remove(id);
-            updateList();
+            grabFilterSortState();
+            updateList(query, priorityFilter, completed, ascending);
             return null;
         }
 
@@ -101,7 +107,8 @@ public class todoService {
 
         currentItem.setDueDate(dueDate);
 
-        updateList();
+        grabFilterSortState();
+        updateList(query, priorityFilter, completed, ascending);
         return currentItem;
     }
 
@@ -111,7 +118,8 @@ public class todoService {
         currentItem.setCompleted(true);
         currentItem.setDoneDate(LocalDate.now());
 
-        updateList();
+        grabFilterSortState();
+        updateList(query, priorityFilter, completed, ascending);
         return currentItem;
     }
 
@@ -121,7 +129,17 @@ public class todoService {
         currentItem.setCompleted(false);
         currentItem.setDoneDate(null);
 
-        updateList();
+        grabFilterSortState();
+        updateList(query, priorityFilter, completed, ascending);
         return currentItem;
     }
+
+    // grabs the parameters to properly filter and sort the list of todos
+    public void grabFilterSortState() {
+        query = "";
+        priorityFilter = 0;
+        completed = false;
+        ascending = true;
+    }
+
 }
