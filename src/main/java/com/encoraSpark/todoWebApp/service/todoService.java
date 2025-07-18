@@ -10,10 +10,6 @@ import java.util.*;
 @Service
 public class todoService {
     private Map<UUID, Todo> todoItems = new HashMap<>();
-    private String query;
-    private int priorityFilter;
-    private boolean completed;
-    private boolean ascending;
     private int completedCount;
     public Duration totalTimeCompletion = Duration.ZERO;
 
@@ -26,7 +22,6 @@ public class todoService {
         todoItems.put(newItem.getId(), newItem);
 
         grabFilterSortState();
-        updateList(query, priorityFilter, completed, ascending);
         return newItem;
     }
 
@@ -38,7 +33,6 @@ public class todoService {
         if(delete){
             todoItems.remove(id);
             grabFilterSortState();
-            updateList(query, priorityFilter, completed, ascending);
             return null;
         }
 
@@ -48,7 +42,6 @@ public class todoService {
         currentItem.setDueDate(dueDate);
 
         grabFilterSortState();
-        updateList(query, priorityFilter, completed, ascending);
         return currentItem;
     }
 
@@ -63,7 +56,6 @@ public class todoService {
         completedCount++;
 
         grabFilterSortState();
-        updateList(query, priorityFilter, completed, ascending);
         return currentItem;
     }
 
@@ -78,7 +70,6 @@ public class todoService {
         currentItem.setDoneDate(null);
 
         grabFilterSortState();
-        updateList(query, priorityFilter, completed, ascending);
         return currentItem;
     }
 
@@ -168,10 +159,12 @@ public class todoService {
     // Must update this method to grab filter/sort state from the correct fields on the frontend
     // grabs the parameters to properly filter and sort the list of todos
     private void grabFilterSortState() {
-        query = "";
-        priorityFilter = 0;
-        completed = false;
-        ascending = true;
+        String query = "";
+        int priorityFilter = 0;
+        boolean completed = false;
+        boolean ascending = true;
+
+        updateList(query, priorityFilter, completed, ascending);
     }
 
     // endregion ******
