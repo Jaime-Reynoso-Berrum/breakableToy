@@ -4,7 +4,6 @@ import com.encoraSpark.todoWebApp.model.Todo;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -64,7 +63,7 @@ public class todoService {
                 String lowerCaseQuery = query.toLowerCase();
                 String lowerCaseTodoItem = todoItem.getTodoItem().toLowerCase();
 
-                if(lowerCaseTodoItem.contains(lowerCaseQuery)) {
+                if(!lowerCaseTodoItem.contains(lowerCaseQuery)) {
                     continue;
                 }
             }
