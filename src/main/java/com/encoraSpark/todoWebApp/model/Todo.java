@@ -3,6 +3,7 @@ package com.encoraSpark.todoWebApp.model;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Todo {
@@ -12,17 +13,23 @@ public class Todo {
 
     private UUID id;
     private int priority;
-    private LocalDate creationDate;
-    private LocalDate dueDate;
-    private LocalDate doneDate;
+    private LocalDateTime creationDate;
+    private LocalDateTime dueDate;
+    private LocalDateTime doneDate;
     private boolean completed;
 
-    public Todo(String todoItem, int priority, LocalDate dueDate) {
+    public Todo(String todoItem, int priority, LocalDateTime dueDate) {
         this.id = UUID.randomUUID();
         this.todoItem = todoItem;
         this.priority = priority;
-        this.creationDate = LocalDate.now();
-        this.dueDate = dueDate;
+        this.creationDate = LocalDateTime.now();
+
+        //optional due date
+        if (dueDate != null) {
+            this.dueDate = dueDate;
+        } else {
+            this.dueDate = null;
+        }
         this.doneDate = null;
         this.completed = false;
     }
@@ -31,17 +38,17 @@ public class Todo {
     public UUID getId() { return id;}
     public String getTodoItem() { return todoItem;}
     public int getPriority() { return priority;}
-    public LocalDate getCreationDate() { return creationDate;}
-    public LocalDate getDueDate() { return dueDate;}
-    public LocalDate getDoneDate() { return doneDate;}
+    public LocalDateTime getCreationDate() { return creationDate;}
+    public LocalDateTime getDueDate() { return dueDate;}
+    public LocalDateTime getDoneDate() { return doneDate;}
     public boolean isCompleted() { return completed;}
 
     //Setters
     public void setId(UUID id) { this.id = id; }
     public void setTodoItem(String todoItem) { this.todoItem = todoItem;}
     public void setPriority(int priority) { this.priority = priority;}
-    public void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate;}
-    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate;}
-    public void setDoneDate(LocalDate doneDate) { this.doneDate = doneDate;}
+    public void setCreationDate(LocalDateTime creationDate) { this.creationDate = creationDate;}
+    public void setDueDate(LocalDateTime dueDate) { this.dueDate = dueDate;}
+    public void setDoneDate(LocalDateTime doneDate) { this.doneDate = doneDate;}
     public void setCompleted(boolean completed) { this.completed = completed;}
 }
