@@ -23,13 +23,7 @@ public class Todo {
         this.todoItem = todoItem;
         this.priority = priority;
         this.creationDate = LocalDateTime.now();
-
-        //optional due date
-        if (dueDate != null) {
-            this.dueDate = dueDate;
-        } else {
-            this.dueDate = null;
-        }
+        this.dueDate = dueDate;
         this.doneDate = null;
         this.completed = false;
     }

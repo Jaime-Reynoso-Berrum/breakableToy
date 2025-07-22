@@ -38,8 +38,7 @@ public class todoService {
 
         if(todoItem != null){ currentItem.setTodoItem(todoItem);}
         if(priority != currentItem.getPriority()){ currentItem.setPriority(priority);}
-
-        currentItem.setDueDate(dueDate);
+        if(dueDate != currentItem.getDueDate()){ currentItem.setDueDate(dueDate);}
 
         grabFilterSortState();
         return currentItem;
@@ -165,6 +164,10 @@ public class todoService {
         boolean ascending = true;
 
         updateList(query, priorityFilter, completed, ascending);
+    }
+
+    public Map<UUID, Todo> getTodoMap() {
+        return todoItems;
     }
 
     // endregion ******
