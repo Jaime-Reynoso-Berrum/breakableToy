@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-public class todoService {
+public class TodoService {
     private Map<UUID, Todo> todoItems = new HashMap<>();
     private int completedCount;
     public Duration totalTimeCompletion = Duration.ZERO;
@@ -142,7 +142,7 @@ public class todoService {
             }
 
             // filters results by priority
-            if (todoItem.getPriority() != 0 && todoItem.getPriority() != priority) {
+            if (priority != 0 && todoItem.getPriority() != priority) {
                 continue;
             }
 

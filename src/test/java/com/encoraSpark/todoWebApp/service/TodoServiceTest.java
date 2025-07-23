@@ -1,23 +1,21 @@
 package com.encoraSpark.todoWebApp.service;
 
 import com.encoraSpark.todoWebApp.model.Todo;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions.*;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class todoServiceTest {
-    private todoService todoService;
+public class TodoServiceTest {
+    private TodoService todoService;
 
     @BeforeEach
     public void setUp() {
-        todoService = new todoService();
+        todoService = new TodoService();
     }
 
     @Test
@@ -121,7 +119,6 @@ public class todoServiceTest {
 
     @Test
     public void testGetAvgTimeCompletion(){
-        LocalDateTime dueDate = LocalDateTime.now();
 
         // created 3 nodes and marks them completed
         Todo item1 = todoService.addTodo("Test Item 1", 0, null);
@@ -141,20 +138,35 @@ public class todoServiceTest {
         assertEquals("Days: 1   Hours: 5   Minutes: 59   Seconds: 20", result);
     }
 
+    @Test
+    public void testUpdateList(){
+        LocalDateTime now = LocalDateTime.now();
 
+        // 5 dumy objects that will be tested for sorting/filtering
+        Todo item1 = todoService.addTodo("Test Item 1: car", 1, now.plusHours(1));
+        Todo item2 = todoService.addTodo("Test Item 2: car", 1, now.plusHours(3));
+        Todo item3 = todoService.addTodo("Test Item 3: car", 2, null);
+        Todo item4 = todoService.addTodo("Test Item 4: truck", 0, null);
+        Todo item5 = todoService.addTodo("Test Item 5: truck", 3, null);
+
+        // tests if query search fliter and priority filter both work
+        List<Todo> result = todoService.updateList("car", 1, false, true);
+        assertEquals(2, result.size());
+
+        // tests to see if the sorting by due date in descending order works.
+        result = todoService.updateList("car", 1, false, false);
+        assertEquals(item2.getId(), result.get(0).getId());
+
+        item3.setCompleted(true);
+        item4.setCompleted(true);
+        item5.setCompleted(true);
+
+        // tests to see if query filter and completed filter work
+        result = todoService.updateList("truck", 0, true, false);
+        assertEquals(2, result.size());
+
+        // test to see if all filters work together correctly
+        result = todoService.updateList("truck", 3, true, false);
+        assertEquals(1, result.size());
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
