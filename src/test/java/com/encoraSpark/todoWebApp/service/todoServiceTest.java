@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -72,6 +73,50 @@ public class todoServiceTest {
         assertEquals(updatedString, updatedTodo.getTodoItem());
         assertEquals(updatedPriority, updatedTodo.getPriority());
         assertEquals(updatedDueDate, updatedTodo.getDueDate());
+    }
+
+    @Test
+    public void testCompleteTodoItem() {
+        String testString = "Complete a TodoItem Test";
+        int priority = 0;
+        LocalDateTime dueDate = null;
+        Todo item = todoService.addTodo(testString, priority, dueDate);
+        item.setCreationDate(LocalDateTime.now().minusDays(3));
+
+        // Completes the todo and verifies that it is marked complete
+        Todo itemComplete = todoService.completeTodoItem(item.getId());
+        assertTrue(itemComplete.isCompleted());
+        assertNotNull(itemComplete.getDoneDate());
+
+        // Tests if time completion is added to TotalTimeCompletion
+        // and checks if completedCount is incremented
+        Duration duration = Duration.between(itemComplete.getCreationDate(), itemComplete.getDoneDate());
+        assertEquals(duration, todoService.getTotalTimeCompletion());
+        assertEquals(1, todoService.getCompletedCount());
+    }
+
+    @Test
+    public void testUndoCompleteTodoItem(){
+        String testString = "Undo TodoItem Test";
+        int priority = 0;
+        LocalDateTime dueDate = null;
+        Todo item = todoService.addTodo(testString, priority, dueDate);
+        item.setCreationDate(LocalDateTime.now().minusDays(3));
+
+        //completes todo and grabs duration time
+        Todo itemComplete = todoService.completeTodoItem(item.getId());
+        Duration duration = Duration.between(itemComplete.getCreationDate(), itemComplete.getDoneDate());
+
+
+        // undos completing the todo and verifies that it is marked not complete
+        Todo undoComplete = todoService.undoCompleteTodoItem(item.getId());
+        assertFalse(undoComplete.isCompleted());
+        assertNull(undoComplete.getDoneDate());
+
+        // Tests if time durationo time is subtracted from TotalTimeCompletion
+        // and checks if completedCount is reduced by 1
+        assertEquals(Duration.ZERO, todoService.getTotalTimeCompletion());
+        assertEquals(0, todoService.getCompletedCount());
     }
 
 

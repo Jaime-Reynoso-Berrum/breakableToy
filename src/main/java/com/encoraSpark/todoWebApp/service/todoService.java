@@ -45,7 +45,7 @@ public class todoService {
     }
 
     //marks the current todo item as completed/done and adds todoDuration time to totalTimeCompletion variable
-    public Todo completeTodo(UUID id){
+    public Todo completeTodoItem(UUID id){
         Todo currentItem = todoItems.get(id);
         currentItem.setCompleted(true);
 
@@ -59,7 +59,7 @@ public class todoService {
     }
 
     //undos an item from being marked as completed/done and removes todoDuration time from totalTime
-    public Todo undoCompleteTodo(UUID id){
+    public Todo undoCompleteTodoItem(UUID id){
         Todo currentItem = todoItems.get(id);
         currentItem.setCompleted(false);
 
@@ -83,7 +83,7 @@ public class todoService {
         long seconds = average.toSecondsPart();
 
         return String.format("Days: %d   Hours: %d   Minutes: %d   Seconds: %d",
-                days, hours, minutes, seconds);
+                              days, hours, minutes, seconds);
     }
 
     //updates page with the current todo items
@@ -166,9 +166,17 @@ public class todoService {
         updateList(query, priorityFilter, completed, ascending);
     }
 
-    public Map<UUID, Todo> getTodoMap() {
-        return todoItems;
-    }
+    // endregion ******
+
+
+    // region **** TEST METHODS ****
+
+    public Duration getTotalTimeCompletion() { return totalTimeCompletion;}
+
+    public int getCompletedCount() { return completedCount;}
+
+    public Map<UUID, Todo> getTodoMap() { return todoItems; }
+
 
     // endregion ******
 }
