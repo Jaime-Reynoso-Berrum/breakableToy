@@ -119,5 +119,42 @@ public class todoServiceTest {
         assertEquals(0, todoService.getCompletedCount());
     }
 
+    @Test
+    public void testGetAvgTimeCompletion(){
+        LocalDateTime dueDate = LocalDateTime.now();
+
+        // created 3 nodes and marks them completed
+        Todo item1 = todoService.addTodo("Test Item 1", 0, null);
+        item1.setCreationDate(LocalDateTime.now().minusDays(3));
+        todoService.completeTodoItem(item1.getId());
+
+        Todo item2 = todoService.addTodo("Test Item 2", 0, null);
+        item2.setCreationDate(LocalDateTime.now().minusHours(17));
+        todoService.completeTodoItem(item2.getId());
+
+        Todo item3 = todoService.addTodo("Test Item 3", 0, null);
+        item3.setCreationDate(LocalDateTime.now().minusMinutes(58));
+        todoService.completeTodoItem(item3.getId());
+
+        // average 1 day, 5 hours, 59 minutes, 20 seconds
+        String result = todoService.getAvgCompletionTime();
+        assertEquals("Days: 1   Hours: 5   Minutes: 59   Seconds: 20", result);
+    }
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
