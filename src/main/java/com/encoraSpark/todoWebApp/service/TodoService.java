@@ -87,7 +87,7 @@ public class TodoService {
     }
 
     //updates page with the current todo items
-    public List<Todo> updateList(String query, int priorityFilter, boolean completed, boolean ascending){
+    public List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending){
 
         //filters the list based on 3 parameters, and then sorts it
         List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
@@ -160,7 +160,7 @@ public class TodoService {
     private void grabFilterSortState() {
         String query = "";
         int priorityFilter = 0;
-        boolean completed = false;
+        Boolean completed = false;
         boolean ascending = true;
 
         updateList(query, priorityFilter, completed, ascending);
