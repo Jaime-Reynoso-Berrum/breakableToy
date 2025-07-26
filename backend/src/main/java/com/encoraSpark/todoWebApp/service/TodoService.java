@@ -121,42 +121,46 @@ public class TodoService {
         return finalList;
     }
 
-    //sorts todo objects by their due date
-    public List<Todo> sortedTodos(List<Todo> todos, boolean ascending){
+    //sorts todo objects by their due date and priority
+    public List<Todo> sortedTodos(List<Todo> todos, boolean ascending, boolean sortByDuedate){
         List<Todo> sortedList = new ArrayList<>(todos);
 
-        Collections.sort(sortedList, new Comparator<Todo>() {
+        Comparator<Todo> comparator = new Comparator<Todo>() {
             @Override
             public int compare(Todo item1, Todo item2) {
-                LocalDateTime date1 = item1.getDueDate();
-                LocalDateTime date2 = item2.getDueDate();
+                int result;
 
-                if (date1 == null && date2 == null) return 0;
-                if (date1 == null) return 1;
-                if (date2 == null) return -1;
+                if (sortByDuedate) {
+                    result = filterByDueDate(item1, item2);
+                    if (result == 0) {
+                        result = filterByPriority(item1, item2);
+                    }
+                } else {
+                    result = filterByPriority(item1, item2);
+                    if (result == 0) {
+                        result = filterByDueDate(item1, item2);
+                    }
+                }
 
-                int result = date1.compareTo(date2);
-
-                if(!ascending) result = -result;
-
-                return result;
+                if (ascending) { return result; }
+                return -result;
             }
-        });
+        };
+
+        Collections.sort(sortedList, comparator);
         return sortedList;
     }
-
-
 
     // endregion *******
 
     // region **** Helper Methods ****
 
     //updates page with the current todo items
-    private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending){
+    private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending, boolean sortByDueDate){
 
         //filters the list based on 3 parameters, and then sorts it
         List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
-        List<Todo> finalList = sortedTodos(filteredList, ascending);
+        List<Todo> finalList = sortedTodos(filteredList, ascending, sortByDueDate);
 
         return finalList;
     }
