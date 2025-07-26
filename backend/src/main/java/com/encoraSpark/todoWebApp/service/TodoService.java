@@ -12,11 +12,14 @@ public class TodoService {
     private Map<UUID, Todo> todoItems = new HashMap<>();
     private int completedCount;
     public Duration totalTimeCompletion = Duration.ZERO;
-    private string currentQuery = "";
+    private String currentQuery = "";
     private int currentPriorityFilter = 0;
     private Boolean currentCompleted = null;
-    private boole
+    private boolean currentAscending = true;
+    private boolean currentSortByDueDate = true;
 
+    // cached filtered and sorted list
+    private List<Todo> finalList = new ArrayList<>();
 
     // region **** Business Methods ****
 
@@ -130,15 +133,17 @@ public class TodoService {
             public int compare(Todo item1, Todo item2) {
                 int result;
 
+                // sorts by due date first, and then by priority
                 if (sortByDuedate) {
-                    result = filterByDueDate(item1, item2);
+                    result = sortByDueDate(item1, item2);
                     if (result == 0) {
-                        result = filterByPriority(item1, item2);
+                        result = sortByPriority(item1, item2);
                     }
                 } else {
-                    result = filterByPriority(item1, item2);
+                    // sorts by priority first, then by due date
+                    result = sortByPriority(item1, item2);
                     if (result == 0) {
-                        result = filterByDueDate(item1, item2);
+                        result = sortByDueDate(item1, item2);
                     }
                 }
 
@@ -151,22 +156,42 @@ public class TodoService {
         return sortedList;
     }
 
+    // grabs the parameters to properly filter and sort the list of todos
+    public void setFilterSortState(String query, int priority, Boolean completed, boolean ascending, boolean sortByDuedate){
+        currentQuery = (query == null) ? "" : query;
+        currentPriorityFilter = priority;
+        currentCompleted = completed;
+        currentAscending = ascending;
+        currentSortByDueDate = sortByDuedate;
+
+        grabFilterSortState();
+    }
+
+    // grabs the current filtered and sorted list
+    public List<Todo> getFinalList(){
+        return new ArrayList<>(finalList);
+    }
+
     // endregion *******
 
     // region **** Helper Methods ****
+
+    private void grabFilterSortState(){
+        finalList = updateList(currentQuery, currentPriorityFilter, currentCompleted, currentAscending, currentSortByDueDate);
+    }
 
     //updates page with the current todo items
     private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending, boolean sortByDueDate){
 
         //filters the list based on 3 parameters, and then sorts it
         List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
-        List<Todo> finalList = sortedTodos(filteredList, ascending, sortByDueDate);
+        List<Todo> sortedList = sortedTodos(filteredList, ascending, sortByDueDate);
 
-        return finalList;
+        return sortedList;
     }
 
     // compares due dates of two items to sort them
-    private int filterByDueDate(Todo item1, Todo item2){
+    private int sortByDueDate(Todo item1, Todo item2){
         LocalDateTime date1 = item1.getDueDate();
         LocalDateTime date2 = item2.getDueDate();
 
@@ -177,19 +202,8 @@ public class TodoService {
     }
 
     // compares priority of two items to sort them
-    private int filterByPriority(Todo item1, Todo item2) {
+    private int sortByPriority(Todo item1, Todo item2) {
         return Integer.compare(item1.getPriority(), item2.getPriority());
-    }
-
-    // Must update this method to grab filter/sort state from the correct fields on the frontend
-    // grabs the parameters to properly filter and sort the list of todos
-    private void grabFilterSortState() {
-        String query = "";
-        int priorityFilter = 0;
-        Boolean completed = false;
-        boolean ascending = true;
-
-        updateList(query, priorityFilter, completed, ascending);
     }
 
     // endregion ******
