@@ -86,46 +86,8 @@ public class TodoService {
                               days, hours, minutes, seconds);
     }
 
-    //updates page with the current todo items
-    public List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending){
-
-        //filters the list based on 3 parameters, and then sorts it
-        List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
-        List<Todo> finalList = sortedTodos(filteredList, ascending);
-
-        return finalList;
-    }
-
-    // endregion *******
-
-    // region **** Helper Methods ****
-
-    //sorts todo objects by their due date
-    private List<Todo> sortedTodos(List<Todo> todos, boolean ascending){
-        List<Todo> sortedList = new ArrayList<>(todos);
-
-        Collections.sort(sortedList, new Comparator<Todo>() {
-            @Override
-            public int compare(Todo item1, Todo item2) {
-                LocalDateTime date1 = item1.getDueDate();
-                LocalDateTime date2 = item2.getDueDate();
-
-                if (date1 == null && date2 == null) return 0;
-                if (date1 == null) return 1;
-                if (date2 == null) return -1;
-
-                int result = date1.compareTo(date2);
-
-                if(!ascending) result = -result;
-
-                return result;
-            }
-        });
-        return sortedList;
-    }
-
     //filters todo items based on query search, priority, and completed status
-    private List<Todo> filterTodos(String query, int priority, Boolean completed){
+    public List<Todo> filterTodos(String query, int priority, Boolean completed){
         List<Todo> finalList = new ArrayList<>();
 
         // adds todoItem to finalList based on filter options
@@ -154,6 +116,48 @@ public class TodoService {
         }
         return finalList;
     }
+
+    //sorts todo objects by their due date
+    public List<Todo> sortedTodos(List<Todo> todos, boolean ascending){
+        List<Todo> sortedList = new ArrayList<>(todos);
+
+        Collections.sort(sortedList, new Comparator<Todo>() {
+            @Override
+            public int compare(Todo item1, Todo item2) {
+                LocalDateTime date1 = item1.getDueDate();
+                LocalDateTime date2 = item2.getDueDate();
+
+                if (date1 == null && date2 == null) return 0;
+                if (date1 == null) return 1;
+                if (date2 == null) return -1;
+
+                int result = date1.compareTo(date2);
+
+                if(!ascending) result = -result;
+
+                return result;
+            }
+        });
+        return sortedList;
+    }
+
+    //updates page with the current todo items
+    private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending){
+
+        //filters the list based on 3 parameters, and then sorts it
+        List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
+        List<Todo> finalList = sortedTodos(filteredList, ascending);
+
+        return finalList;
+    }
+
+    // endregion *******
+
+    // region **** Helper Methods ****
+
+
+
+
 
     // Must update this method to grab filter/sort state from the correct fields on the frontend
     // grabs the parameters to properly filter and sort the list of todos
