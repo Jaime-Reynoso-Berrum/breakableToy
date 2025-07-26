@@ -161,6 +161,7 @@ public class TodoService {
         return finalList;
     }
 
+    // compares due dates of two items to sort them
     private int filterByDueDate(Todo item1, Todo item2){
         LocalDateTime date1 = item1.getDueDate();
         LocalDateTime date2 = item2.getDueDate();
@@ -171,7 +172,10 @@ public class TodoService {
         else return date1.compareTo(date2);
     }
 
-
+    // compares priority of two items to sort them
+    private int filterByPriority(Todo item1, Todo item2) {
+        return Integer.compare(item1.getPriority(), item2.getPriority());
+    }
 
     // Must update this method to grab filter/sort state from the correct fields on the frontend
     // grabs the parameters to properly filter and sort the list of todos
