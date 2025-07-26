@@ -14,6 +14,7 @@ public class TodoService {
     private int highCompletedCount;
     private int mediumCompletedCount;
     private int lowCompletedCount;
+    private Duration totalTimeCompletion;
     public Duration highTimeCompletion = Duration.ZERO;
     public Duration mediumTimeCompletion = Duration.ZERO;
     public Duration lowTimeCompletion = Duration.ZERO;
@@ -55,47 +56,47 @@ public class TodoService {
         return currentItem;
     }
 
-    //marks the current todo item as completed/done and adds todoDuration time to totalTimeCompletion variable
+    //marks the current todo item as completed/done and adds todoDuration to metrics
     public Todo completeTodoItem(UUID id){
         Todo currentItem = todoItems.get(id);
         currentItem.setCompleted(true);
 
+        // calculates total duration time and adds it to metrics
         currentItem.setDoneDate(LocalDateTime.now());
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
-
         addTimeToMetrics(currentItem.getPriority(), todoDuration);
 
         grabFilterSortState();
         return currentItem;
     }
 
-    //undos an item from being marked as completed/done and removes todoDuration time from totalTime
+    // undos an item from being marked as completed/done and removes todoDuration time from metrics
     public Todo undoCompleteTodoItem(UUID id){
         Todo currentItem = todoItems.get(id);
         currentItem.setCompleted(false);
 
+        // removes duration from metrics and sets items done date to null
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
-        totalTimeCompletion = totalTimeCompletion.minus(todoDuration);
-        completedCount--;
+        removeTimeFromMetrics(currentItem.getPriority(), todoDuration);
         currentItem.setDoneDate(null);
 
         grabFilterSortState();
         return currentItem;
     }
 
-    // Returns the average completion time required for the metrics
-    public String getAvgCompletionTime(){
-        if (totalCompletedCount == 0) return "Complete a To Do item to find the average";
+    // Returns the average completion times required for the metrics
+    public String[] getAvgCompletionTime(){
 
-        Duration totalTimeCompletion = highTimeCompletion.plus(mediumTimeCompletion).plus(lowTimeCompletion);
-        Duration average = totalTimeCompletion.dividedBy(totalCompletedCount);
-        long days = average.toDays();
-        long hours = average.toHoursPart();
-        long minutes = average.toMinutesPart();
-        long seconds = average.toSecondsPart();
+        // calculates total time and divides by total completed count
+        totalTimeCompletion = highTimeCompletion.plus(mediumTimeCompletion).plus(lowTimeCompletion);
+        String avgTotalTime = calculateMetrics(totalTimeCompletion, totalCompletedCount);
 
-        return String.format("Days: %d   Hours: %d   Minutes: %d   Seconds: %d",
-                              days, hours, minutes, seconds);
+        // calculates avg times for each priority
+        String avgHighTime = calculateMetrics(highTimeCompletion, highCompletedCount);
+        String avgMediumTime = calculateMetrics(mediumTimeCompletion, mediumCompletedCount);
+        String avgLowTime = calculateMetrics(lowTimeCompletion, lowCompletedCount);
+
+        return new String[]{avgTotalTime, avgHighTime, avgMediumTime, avgLowTime};
     }
 
     //filters todo items based on query search, priority, and completed status
@@ -211,6 +212,7 @@ public class TodoService {
         return Integer.compare(item1.getPriority(), item2.getPriority());
     }
 
+    //adds completed count and time to variables depending on todo item priority
     private void addTimeToMetrics(int priority, Duration duration){
         switch (priority) {
             case 0:
@@ -230,7 +232,46 @@ public class TodoService {
                 lowTimeCompletion.plus(duration);
                 lowCompletedCount++;
                 totalCompletedCount++;
+                break;
         }
+    }
+
+    // removes completed count and time to variables depending on todo item priority
+    private void removeTimeFromMetrics(int priority, Duration duration){
+        switch (priority) {
+            case 0:
+                totalCompletedCount--;
+                break;
+            case 1:
+                highTimeCompletion.minus(duration);
+                highCompletedCount--;
+                totalCompletedCount--;
+                break;
+            case 2:
+                mediumTimeCompletion.minus(duration);
+                mediumCompletedCount--;
+                totalCompletedCount--;
+                break;
+            case 3:
+                lowTimeCompletion.minus(duration);
+                lowCompletedCount--;
+                totalCompletedCount--;
+                break;
+        }
+    }
+
+    // returns a string representation of avg completion time
+    private String calculateMetrics(Duration todoDuration, int todoCount){
+        if (todoCount == 0) return "Complete a To Do item to find the average";
+
+        Duration average = todoDuration.dividedBy(todoCount);
+        long days = average.toDays();
+        long hours = average.toHoursPart();
+        long minutes = average.toMinutesPart();
+        long seconds = average.toSecondsPart();
+
+        return String.format("Days: %d   Hours: %d   Minutes: %d   Seconds: %d",
+                days, hours, minutes, seconds);
     }
 
     // endregion ******
@@ -240,7 +281,7 @@ public class TodoService {
 
     public Duration getTotalTimeCompletion() { return totalTimeCompletion;}
 
-    public int getCompletedCount() { return completedCount;}
+    public int getCompletedCount() { return totalCompletedCount;}
 
     public Map<UUID, Todo> getTodoMap() { return todoItems; }
 
