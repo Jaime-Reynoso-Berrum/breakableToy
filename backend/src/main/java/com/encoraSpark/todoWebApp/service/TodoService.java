@@ -12,6 +12,10 @@ public class TodoService {
     private Map<UUID, Todo> todoItems = new HashMap<>();
     private int completedCount;
     public Duration totalTimeCompletion = Duration.ZERO;
+    private string currentQuery = "";
+    private int currentPriorityFilter = 0;
+    private Boolean currentCompleted = null;
+    private boole
 
 
     // region **** Business Methods ****
@@ -141,6 +145,12 @@ public class TodoService {
         return sortedList;
     }
 
+
+
+    // endregion *******
+
+    // region **** Helper Methods ****
+
     //updates page with the current todo items
     private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending){
 
@@ -151,11 +161,15 @@ public class TodoService {
         return finalList;
     }
 
-    // endregion *******
+    private int filterByDueDate(Todo item1, Todo item2){
+        LocalDateTime date1 = item1.getDueDate();
+        LocalDateTime date2 = item2.getDueDate();
 
-    // region **** Helper Methods ****
-
-
+        if (date1 == null && date2 == null) return 0;
+        else if (date1 == null) return 1;
+        else if (date2 == null) return -1;
+        else return date1.compareTo(date2);
+    }
 
 
 
