@@ -10,15 +10,19 @@ import java.util.*;
 @Service
 public class TodoService {
     private Map<UUID, Todo> todoItems = new HashMap<>();
-    private int completedCount;
-    public Duration totalTimeCompletion = Duration.ZERO;
+    private int totalCompletedCount;
+    private int highCompletedCount;
+    private int mediumCompletedCount;
+    private int lowCompletedCount;
+    public Duration highTimeCompletion = Duration.ZERO;
+    public Duration mediumTimeCompletion = Duration.ZERO;
+    public Duration lowTimeCompletion = Duration.ZERO;
     private String currentQuery = "";
     private int currentPriorityFilter = 0;
     private Boolean currentCompleted = null;
     private boolean currentAscending = true;
     private boolean currentSortByDueDate = true;
 
-    // cached filtered and sorted list
     private List<Todo> finalList = new ArrayList<>();
 
     // region **** Business Methods ****
@@ -58,8 +62,8 @@ public class TodoService {
 
         currentItem.setDoneDate(LocalDateTime.now());
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
-        totalTimeCompletion = totalTimeCompletion.plus(todoDuration);
-        completedCount++;
+
+        addTimeToMetrics(currentItem.getPriority(), todoDuration);
 
         grabFilterSortState();
         return currentItem;
@@ -81,9 +85,10 @@ public class TodoService {
 
     // Returns the average completion time required for the metrics
     public String getAvgCompletionTime(){
-        if (completedCount == 0) return "Complete a To Do item to find the average";
+        if (totalCompletedCount == 0) return "Complete a To Do item to find the average";
 
-        Duration average = totalTimeCompletion.dividedBy(completedCount);
+        Duration totalTimeCompletion = highTimeCompletion.plus(mediumTimeCompletion).plus(lowTimeCompletion);
+        Duration average = totalTimeCompletion.dividedBy(totalCompletedCount);
         long days = average.toDays();
         long hours = average.toHoursPart();
         long minutes = average.toMinutesPart();
@@ -204,6 +209,28 @@ public class TodoService {
     // compares priority of two items to sort them
     private int sortByPriority(Todo item1, Todo item2) {
         return Integer.compare(item1.getPriority(), item2.getPriority());
+    }
+
+    private void addTimeToMetrics(int priority, Duration duration){
+        switch (priority) {
+            case 0:
+                totalCompletedCount++;
+                break;
+            case 1:
+                highTimeCompletion.plus(duration);
+                highCompletedCount++;
+                totalCompletedCount++;
+                break;
+            case 2:
+                mediumTimeCompletion.plus(duration);
+                mediumCompletedCount++;
+                totalCompletedCount++;
+                break;
+            case 3:
+                lowTimeCompletion.plus(duration);
+                lowCompletedCount++;
+                totalCompletedCount++;
+        }
     }
 
     // endregion ******
