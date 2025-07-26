@@ -5,7 +5,7 @@ interface AddModalProps {
     onSubmit: (todoItem: string, priority: number, dueDate: string | null) => void;
 }
 
-export default function AddTodoModal({ onClose, onSubmit }: AddModalProps){
+function AddTodoModal({ onClose, onSubmit }: AddModalProps){
     const [todoItem, setTodoItem] = useState('');
     const [priority, setPriority] = useState(1);
     const [dueDate, setDueDate] = useState<string | null > (null);
@@ -81,3 +81,5 @@ export default function AddTodoModal({ onClose, onSubmit }: AddModalProps){
         </div>
     );
 }
+
+export default AddTodoModal;

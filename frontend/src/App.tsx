@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import './App.css'
 import AddTodoModal from "./components/modals/AddTodoModal.tsx";
-import EditTodoModal from "./components/modals/EditTodoModal.tsx";
+import EditTodoModal from "./components/modals/EditTodoModal.tsx"
+import FilterBar from "./components/FilterBar.tsx";
+
 
 interface todo {
     id: string;
@@ -20,6 +22,10 @@ function App() {
   const [AddModalOpen, setAddModalOpen] = useState(false);
   const [EditModalOpen, setEditModalOpen] = useState(false);
   const [EditingTodo, setEditingTodo] = useState<todo | null>(null);
+
+  const [queryFilter, setQueryFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<number>(0);
+  const [completedFilter, setCompletedFilter] = useState<boolean | null>(null);
 
   const handleAdd = (todoItem: string, priority: number, dueDate: string | null) => {
       console.log("New todo: ", {todoItem, priority, dueDate });
@@ -40,17 +46,31 @@ function App() {
         setEditingTodo(null);
     }
 
+    const handleOnFilter = () => {
+      // api call goes here
+        console.log({queryFilter, priorityFilter, completedFilter});
+    }
+
   return (
     <>
+        <FilterBar
+        queryFilter={queryFilter}
+        setQueryFilter={setQueryFilter}
+        priorityFilter={priorityFilter}
+        setPriorityFilter={setPriorityFilter}
+        completedFilter={completedFilter}
+        setCompletedFilter={setCompletedFilter}
+        onFilter={handleOnFilter}
+        />
         <div>
-            <button onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
+            <button style = {{ border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
 
 
             <ul>
                 {todos.map((todo) => (
                     <li key={todo.id}>
                         <strong>{todo.todoItem}</strong> (Priority: {todo.priority})
-                        <button onClick={() => openEditModal(todo)} style={{marginLeft: 10}}>
+                        <button style = {{ border: '1px solid black', marginLeft: 10}} onClick={() => openEditModal(todo)}>
                             Edit/Delete
                         </button>
                     </li>
