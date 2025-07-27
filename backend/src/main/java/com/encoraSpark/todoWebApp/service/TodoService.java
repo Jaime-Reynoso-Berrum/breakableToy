@@ -33,7 +33,7 @@ public class TodoService {
         Todo newItem = new Todo(todoItem, priority, dueDate);
         todoItems.put(newItem.getId(), newItem);
 
-        grabFilterSortState();
+        updateList();
         return newItem;
     }
 
@@ -44,7 +44,7 @@ public class TodoService {
         // deletes the current item from todoItems hashmap and the list
         if(delete){
             todoItems.remove(id);
-            grabFilterSortState();
+            updateList();
             return null;
         }
 
@@ -52,7 +52,7 @@ public class TodoService {
         if(priority != currentItem.getPriority()){ currentItem.setPriority(priority);}
         if(dueDate != currentItem.getDueDate()){ currentItem.setDueDate(dueDate);}
 
-        grabFilterSortState();
+        updateList();
         return currentItem;
     }
 
@@ -66,7 +66,7 @@ public class TodoService {
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
         addTimeToMetrics(currentItem.getPriority(), todoDuration);
 
-        grabFilterSortState();
+        updateList();
         return currentItem;
     }
 
@@ -80,7 +80,7 @@ public class TodoService {
         removeTimeFromMetrics(currentItem.getPriority(), todoDuration);
         currentItem.setDoneDate(null);
 
-        grabFilterSortState();
+        updateList();
         return currentItem;
     }
 
@@ -89,6 +89,7 @@ public class TodoService {
 
         // calculates total time and divides by total completed count
         totalTimeCompletion = highTimeCompletion.plus(mediumTimeCompletion).plus(lowTimeCompletion);
+        totalCompletedCount = highCompletedCount + mediumCompletedCount + lowCompletedCount;
         String avgTotalTime = calculateMetrics(totalTimeCompletion, totalCompletedCount);
 
         // calculates avg times for each priority
@@ -96,6 +97,7 @@ public class TodoService {
         String avgMediumTime = calculateMetrics(mediumTimeCompletion, mediumCompletedCount);
         String avgLowTime = calculateMetrics(lowTimeCompletion, lowCompletedCount);
 
+        // answer returned in an array
         return new String[]{avgTotalTime, avgHighTime, avgMediumTime, avgLowTime};
     }
 
@@ -162,38 +164,32 @@ public class TodoService {
         return sortedList;
     }
 
-    // grabs the parameters to properly filter and sort the list of todos
-    public void setFilterSortState(String query, int priority, Boolean completed, boolean ascending, boolean sortByDuedate){
-        currentQuery = (query == null) ? "" : query;
-        currentPriorityFilter = priority;
-        currentCompleted = completed;
-        currentAscending = ascending;
-        currentSortByDueDate = sortByDuedate;
-
-        grabFilterSortState();
-    }
-
-    // grabs the current filtered and sorted list
-    public List<Todo> getFinalList(){
-        return new ArrayList<>(finalList);
-    }
 
     // endregion *******
 
     // region **** Helper Methods ****
 
-    private void grabFilterSortState(){
+    private void updateList(){
         finalList = updateList(currentQuery, currentPriorityFilter, currentCompleted, currentAscending, currentSortByDueDate);
     }
 
     //updates page with the current todo items
     private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending, boolean sortByDueDate){
+        // saves variables for reuse
+        currentQuery = query;
+        currentPriorityFilter = priorityFilter;
+        currentCompleted = completed;
+        currentAscending = ascending;
+        currentSortByDueDate = sortByDueDate;
 
         //filters the list based on 3 parameters, and then sorts it
         List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
-        List<Todo> sortedList = sortedTodos(filteredList, ascending, sortByDueDate);
+        return sortedTodos(filteredList, ascending, sortByDueDate);
+    }
 
-        return sortedList;
+    // grabs the current filtered and sorted list
+    private List<Todo> getFinalList(){
+        return new ArrayList<>(finalList);
     }
 
     // compares due dates of two items to sort them
@@ -215,23 +211,17 @@ public class TodoService {
     //adds completed count and time to variables depending on todo item priority
     private void addTimeToMetrics(int priority, Duration duration){
         switch (priority) {
-            case 0:
-                totalCompletedCount++;
-                break;
             case 1:
                 highTimeCompletion.plus(duration);
                 highCompletedCount++;
-                totalCompletedCount++;
                 break;
             case 2:
                 mediumTimeCompletion.plus(duration);
                 mediumCompletedCount++;
-                totalCompletedCount++;
                 break;
             case 3:
                 lowTimeCompletion.plus(duration);
                 lowCompletedCount++;
-                totalCompletedCount++;
                 break;
         }
     }
@@ -239,23 +229,17 @@ public class TodoService {
     // removes completed count and time to variables depending on todo item priority
     private void removeTimeFromMetrics(int priority, Duration duration){
         switch (priority) {
-            case 0:
-                totalCompletedCount--;
-                break;
             case 1:
                 highTimeCompletion.minus(duration);
                 highCompletedCount--;
-                totalCompletedCount--;
                 break;
             case 2:
                 mediumTimeCompletion.minus(duration);
                 mediumCompletedCount--;
-                totalCompletedCount--;
                 break;
             case 3:
                 lowTimeCompletion.minus(duration);
                 lowCompletedCount--;
-                totalCompletedCount--;
                 break;
         }
     }
@@ -271,7 +255,7 @@ public class TodoService {
         long seconds = average.toSecondsPart();
 
         return String.format("Days: %d   Hours: %d   Minutes: %d   Seconds: %d",
-                days, hours, minutes, seconds);
+                              days, hours, minutes, seconds);
     }
 
     // endregion ******

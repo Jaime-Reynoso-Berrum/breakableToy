@@ -47,17 +47,17 @@ public class TodoController {
     }
 
     // filter and sorts the todo list
-    @GetMapping
-    public List<Todo> updateTodoList (@RequestParam(required = false, defaultValue = "") String query,
-                                      @RequestParam(required = false, defaultValue = "0") int priorityFilter,
-                                      @RequestParam(required = false) Boolean completed,
-                                      @RequestParam(required = false, defaultValue = "true") boolean ascending) {
-        return todoService.updateList(query, priorityFilter, completed, ascending);
-    }
+//    @GetMapping
+//    public List<Todo> updateTodoList (@RequestParam(required = false, defaultValue = "") String query,
+//                                      @RequestParam(required = false, defaultValue = "0") int priorityFilter,
+//                                      @RequestParam(required = false) Boolean completed,
+//                                      @RequestParam(required = false, defaultValue = "true") boolean ascending) {
+//        return todoService.updateList(query, priorityFilter, completed, ascending);
+//    }
 
     // grabs the average completion time
-    @GetMapping("/averageCompletionTime")
-    public String getAvgCompletionTime() {
-        return todoService.getAvgCompletionTime();
-    }
+//    @GetMapping("/averageCompletionTime")
+//    public String getAvgCompletionTime() {
+//        return todoService.getAvgCompletionTime();
+//    }
 }
