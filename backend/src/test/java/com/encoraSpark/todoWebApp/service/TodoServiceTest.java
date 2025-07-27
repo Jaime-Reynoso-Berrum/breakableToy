@@ -155,23 +155,24 @@ public class TodoServiceTest {
         LocalDateTime testTime = LocalDateTime.now();
         List<Todo> results;
 
-        // created 10 nodes of each priority and marks them completed
+        // created 30 todos
         for (int i = 1; i <= 30; i++){
             String testString = "Add Me to the List: #" + i;
             int priority;
 
+            // 10 todos for each priority
             if (i % 3 == 0) priority = 1;
             else if (i % 3 == 1) priority = 2;
             else priority = 3;
 
-            if ( i <= 16)       testString += "car";
+            // different strings added for filter tests
+            if ( i <= 16)      testString += "car";
             else if ( i <= 23) testString += "phone";
             else               testString += "honey";
 
             // 15 out of 30 will be marked completed
             Todo testItem = todoService.addTodo(testString, priority, null);
             if (i % 2 == 0) todoService.completeTodoItem(testItem.getId());
-
         }
         // tests if completed filter works alone
         results = todoService.filterTodos("", 0, true);
@@ -188,6 +189,33 @@ public class TodoServiceTest {
         // tests if all filters work together
         results = todoService.filterTodos("car", 1, true);
         assertEquals(2, results.size());
+    }
+
+    @Test
+    public void testSortedTodoTodos(){
+        LocalDateTime testTime = LocalDateTime.now();
+        Todo testItem;
+
+        // created 30 todos
+        for (int i = 1; i <= 30; i++){
+            String testString = "Add Me to the List: #";
+            int priority;
+
+            // 10 todos for each priority
+            if (i % 3 == 0) priority = 1;
+            else if (i % 3 == 1) priority = 2;
+            else priority = 3;
+
+            if (i > 10 && i <= 20) todoService.addTodo(testString, priority, testTime.plusHours(i));
+            else if (i > 20)  todoService.addTodo(testString, priority, testTime.plusMinutes(i));
+            todoService.addTodo(testString, priority, null);
+        }
+        List<Todo> originalList = todoService.getOriginalList();
+
+        // tests if it can descending by due date works.
+        List<Todo> sortedList = todoService.sortedTodos(originalList, false, true);
+        assertEquals(originalList.get(1), sortedList.getFirst());
+
     }
 
 //    @Test

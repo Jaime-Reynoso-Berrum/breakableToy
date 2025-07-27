@@ -24,6 +24,8 @@ public class TodoService {
     private boolean currentAscending = true;
     private boolean currentSortByDueDate = true;
 
+    private List<Todo> originalList = new ArrayList<>();
+    private List<Todo> filteredList = new ArrayList<>();
     private List<Todo> finalList = new ArrayList<>();
 
     // region **** Business Methods ****
@@ -32,6 +34,7 @@ public class TodoService {
     public Todo addTodo(String todoItem, int priority, LocalDateTime dueDate){
         Todo newItem = new Todo(todoItem, priority, dueDate);
         todoItems.put(newItem.getId(), newItem);
+        originalList.add(newItem);
 
         updateList();
         return newItem;
@@ -43,6 +46,7 @@ public class TodoService {
 
         // deletes the current item from todoItems hashmap and the list
         if(delete){
+            originalList.remove(currentItem);
             todoItems.remove(id);
             updateList();
             return null;
@@ -133,8 +137,8 @@ public class TodoService {
     }
 
     //sorts todo objects by their due date and priority
-    public List<Todo> sortedTodos(List<Todo> todos, boolean ascending, boolean sortByDuedate){
-        List<Todo> sortedList = new ArrayList<>(todos);
+    public List<Todo> sortedTodos(List<Todo> filteredList, boolean ascending, boolean sortByDuedate){
+        List<Todo> sortedList = new ArrayList<>(filteredList);
 
         Comparator<Todo> comparator = new Comparator<Todo>() {
             @Override
@@ -174,7 +178,7 @@ public class TodoService {
     }
 
     //updates page with the current todo items
-    private List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending, boolean sortByDueDate){
+    private List<Todo> updateList(String query, int priorityFilter, Boolean completed, Boolean ascending, Boolean sortByDueDate){
         // saves variables for reuse
         currentQuery = query;
         currentPriorityFilter = priorityFilter;
@@ -182,8 +186,12 @@ public class TodoService {
         currentAscending = ascending;
         currentSortByDueDate = sortByDueDate;
 
+
         //filters the list based on 3 parameters, and then sorts it
-        List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
+        filteredList = filterTodos(query, priorityFilter, completed);
+
+        if (sortByDueDate == null && ascending == null) { return filteredList;}
+
         return sortedTodos(filteredList, ascending, sortByDueDate);
     }
 
@@ -275,8 +283,7 @@ public class TodoService {
     public int getMediumCompletedCount() { return mediumCompletedCount;}
     public int getLowCompletedCount() { return lowCompletedCount;}
 
-
-
+    public List<Todo> getOriginalList() {return originalList;}
     public Map<UUID, Todo> getTodoMap() { return todoItems; }
 
 
