@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -147,6 +148,46 @@ public class TodoServiceTest {
         for (int i = 0; i < expected.length; i++){
             assertEquals(expected[i], results[i]);
         }
+    }
+
+    @Test
+    public void testFilterTodos(){
+        LocalDateTime testTime = LocalDateTime.now();
+        List<Todo> results;
+
+        // created 10 nodes of each priority and marks them completed
+        for (int i = 1; i <= 30; i++){
+            String testString = "Add Me to the List: #" + i;
+            int priority;
+
+            if (i % 3 == 0) priority = 1;
+            else if (i % 3 == 1) priority = 2;
+            else priority = 3;
+
+            if ( i <= 16)       testString += "car";
+            else if ( i <= 23) testString += "phone";
+            else               testString += "honey";
+
+            // 15 out of 30 will be marked completed
+            Todo testItem = todoService.addTodo(testString, priority, null);
+            if (i % 2 == 0) todoService.completeTodoItem(testItem.getId());
+
+        }
+        // tests if completed filter works alone
+        results = todoService.filterTodos("", 0, true);
+        assertEquals(15, results.size());
+
+        // tests if query filter works alone
+        results = todoService.filterTodos("one", 0, null);
+        assertEquals(14, results.size());
+
+        // tests if priority filter works alone
+        results = todoService.filterTodos("", 1, null);
+        assertEquals(10, results.size());
+
+        // tests if all filters work together
+        results = todoService.filterTodos("car", 1, true);
+        assertEquals(2, results.size());
     }
 
 //    @Test
