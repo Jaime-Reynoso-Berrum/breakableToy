@@ -147,6 +147,7 @@ public class TodoService {
 
                 // sorts by due date first, and then by priority
                 if (sortByDuedate) {
+
                     result = sortByDueDate(item1, item2);
                     if (result == 0) {
                         result = sortByPriority(item1, item2);
@@ -160,7 +161,9 @@ public class TodoService {
                 }
 
                 if (ascending) { return result; }
-                return -result;
+                else{
+                    return -result;
+                }
             }
         };
 

@@ -194,59 +194,46 @@ public class TodoServiceTest {
     @Test
     public void testSortedTodoTodos(){
         LocalDateTime testTime = LocalDateTime.now();
-        Todo testItem;
 
-        // created 30 todos
-        for (int i = 1; i <= 30; i++){
-            String testString = "Add Me to the List: #";
-            int priority;
+        todoService.addTodo("Test Item 1", 2, testTime.plusHours(1));
+        todoService.addTodo("Test Item 2", 1, testTime.plusHours(3));
+        todoService.addTodo("Test Item 3", 1, testTime.plusHours(2));
+        todoService.addTodo("Test Item 4", 3, testTime.plusHours(4));
+        todoService.addTodo("Test Item 5", 2, null);
 
-            // 10 todos for each priority
-            if (i % 3 == 0) priority = 1;
-            else if (i % 3 == 1) priority = 2;
-            else priority = 3;
+        List<Todo> origialList = todoService.getOriginalList();
 
-            if (i > 10 && i <= 20) todoService.addTodo(testString, priority, testTime.plusHours(i));
-            else if (i > 20)  todoService.addTodo(testString, priority, testTime.plusMinutes(i));
-            todoService.addTodo(testString, priority, null);
-        }
-        List<Todo> originalList = todoService.getOriginalList();
+        //descending by due date, then priority
+        List<Todo> sorted = todoService.sortedTodos(origialList, false, true);
+        assertEquals("Test Item 5", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 4", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 3", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 1", sorted.get(4).getTodoItem());
 
-        // tests if it can descending by due date works.
-        List<Todo> sortedList = todoService.sortedTodos(originalList, false, true);
-        assertEquals(originalList.get(1), sortedList.getFirst());
+        // ascending by due date, then priority
+        sorted = todoService.sortedTodos(origialList, true, true);
+        assertEquals("Test Item 1", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 3", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 4", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 5", sorted.get(4).getTodoItem());
 
+        //descending by priority, then due date
+        sorted = todoService.sortedTodos(origialList, false, false);
+        assertEquals("Test Item 4", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 5", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 1", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 3", sorted.get(4).getTodoItem());
+
+        //descending by priority, then due date
+        sorted = todoService.sortedTodos(origialList, true, false);
+        assertEquals("Test Item 3", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 1", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 5", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 4", sorted.get(4).getTodoItem());
     }
 
-//    @Test
-//    public void testUpdateList(){
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        // 5 dumy objects that will be tested for sorting/filtering
-//        Todo item1 = todoService.addTodo("Test Item 1: car", 1, now.plusHours(1));
-//        Todo item2 = todoService.addTodo("Test Item 2: car", 1, now.plusHours(3));
-//        Todo item3 = todoService.addTodo("Test Item 3: car", 2, null);
-//        Todo item4 = todoService.addTodo("Test Item 4: truck", 0, null);
-//        Todo item5 = todoService.addTodo("Test Item 5: truck", 3, null);
-//
-//        // tests if query search fliter and priority filter both work
-//        List<Todo> result = todoService.updateList("car", 1, false, true);
-//        assertEquals(2, result.size());
-//
-//        // tests to see if the sorting by due date in descending order works.
-//        result = todoService.updateList("car", 1, false, false);
-//        assertEquals(item2.getId(), result.get(0).getId());
-//
-//        item3.setCompleted(true);
-//        item4.setCompleted(true);
-//        item5.setCompleted(true);
-//
-//        // tests to see if query filter and completed filter work
-//        result = todoService.updateList("truck", 0, true, false);
-//        assertEquals(2, result.size());
-//
-//        // test to see if all filters work together correctly
-//        result = todoService.updateList("truck", 3, true, false);
-//        assertEquals(1, result.size());
-//    }
 }
