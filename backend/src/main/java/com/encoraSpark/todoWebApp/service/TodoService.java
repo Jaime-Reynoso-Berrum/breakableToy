@@ -97,7 +97,7 @@ public class TodoService {
         String avgMediumTime = calculateMetrics(mediumTimeCompletion, mediumCompletedCount);
         String avgLowTime = calculateMetrics(lowTimeCompletion, lowCompletedCount);
 
-        // answer returned in an array
+        // answers returned in an array
         return new String[]{avgTotalTime, avgHighTime, avgMediumTime, avgLowTime};
     }
 
@@ -212,16 +212,18 @@ public class TodoService {
     private void addTimeToMetrics(int priority, Duration duration){
         switch (priority) {
             case 1:
-                highTimeCompletion.plus(duration);
+                highTimeCompletion = highTimeCompletion.plus(duration);
                 highCompletedCount++;
                 break;
             case 2:
-                mediumTimeCompletion.plus(duration);
+                mediumTimeCompletion = mediumTimeCompletion.plus(duration);
                 mediumCompletedCount++;
                 break;
             case 3:
-                lowTimeCompletion.plus(duration);
+                lowTimeCompletion = lowTimeCompletion.plus(duration);
                 lowCompletedCount++;
+                break;
+            default:
                 break;
         }
     }
@@ -230,16 +232,18 @@ public class TodoService {
     private void removeTimeFromMetrics(int priority, Duration duration){
         switch (priority) {
             case 1:
-                highTimeCompletion.minus(duration);
+                highTimeCompletion = highTimeCompletion.minus(duration);
                 highCompletedCount--;
                 break;
             case 2:
-                mediumTimeCompletion.minus(duration);
+                mediumTimeCompletion = mediumTimeCompletion.minus(duration);
                 mediumCompletedCount--;
                 break;
             case 3:
-                lowTimeCompletion.minus(duration);
+                lowTimeCompletion = lowTimeCompletion.minus(duration);
                 lowCompletedCount--;
+                break;
+            default:
                 break;
         }
     }
@@ -263,9 +267,15 @@ public class TodoService {
 
     // region **** TEST METHODS ****
 
-    public Duration getTotalTimeCompletion() { return totalTimeCompletion;}
+    public Duration getHighTimeCompletion() { return highTimeCompletion;}
+    public Duration getMediumTimeCompletion() { return mediumTimeCompletion;}
+    public Duration getLowTimeCompletion() { return lowTimeCompletion;}
 
-    public int getCompletedCount() { return totalCompletedCount;}
+    public int getHighCompletedCount() { return highCompletedCount;}
+    public int getMediumCompletedCount() { return mediumCompletedCount;}
+    public int getLowCompletedCount() { return lowCompletedCount;}
+
+
 
     public Map<UUID, Todo> getTodoMap() { return todoItems; }
 

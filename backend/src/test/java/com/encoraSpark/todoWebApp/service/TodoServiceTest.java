@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +18,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testAddTodoItem() {
+    public void testAddTodo() {
         String testString = "Add TodoItem Test";
         int priority = 0;
         LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
@@ -41,7 +40,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testDeleteTodoItem() {
+    public void testDeleteTodo() {
         Todo toBeDeleted = todoService.addTodo("Delete TodoItem test", 0, LocalDateTime.now());
         UUID id = toBeDeleted.getId();
 
@@ -52,12 +51,12 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testUpdateTodoItem() {
+    public void testEditTodo() {
         // original todo item
         String testString = "Update TodoItem Test: Did the fields update correctly";
         int priority = 0;
         LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
-        Todo addedTodo = todoService.addTodo(testString, priority, dueDate);
+        Todo testTodo = todoService.addTodo(testString, priority, dueDate);
 
         // new values to update todo item
         String updatedString = "Did the fields update correctly";
@@ -65,78 +64,90 @@ public class TodoServiceTest {
         LocalDateTime updatedDueDate = LocalDateTime.now().plusDays(5);
 
         // creating and testing the updated todo item
-        Todo updatedTodo = todoService.editTodo(addedTodo.getId(), updatedString, updatedPriority, updatedDueDate, false);
+        todoService.editTodo(testTodo.getId(), updatedString, updatedPriority, updatedDueDate, false);
 
-        assertNotNull(updatedTodo);
-        assertEquals(updatedString, updatedTodo.getTodoItem());
-        assertEquals(updatedPriority, updatedTodo.getPriority());
-        assertEquals(updatedDueDate, updatedTodo.getDueDate());
+        assertNotNull(testTodo);
+        assertEquals(updatedString, testTodo.getTodoItem());
+        assertEquals(updatedPriority, testTodo.getPriority());
+        assertEquals(updatedDueDate, testTodo.getDueDate());
     }
 
     @Test
     public void testCompleteTodoItem() {
         String testString = "Complete a TodoItem Test";
-        int priority = 0;
-        LocalDateTime dueDate = null;
-        Todo item = todoService.addTodo(testString, priority, dueDate);
-        item.setCreationDate(LocalDateTime.now().minusDays(3));
+        int priority = 1;
+        Todo testItem = todoService.addTodo(testString, priority, null);
+        testItem.setCreationDate(LocalDateTime.now().minusDays(3));
 
         // Completes the todo and verifies that it is marked complete
-        Todo itemComplete = todoService.completeTodoItem(item.getId());
-        assertTrue(itemComplete.isCompleted());
-        assertNotNull(itemComplete.getDoneDate());
+        todoService.completeTodoItem(testItem.getId());
+        assertTrue(testItem.isCompleted());
+        assertNotNull(testItem.getDoneDate());
 
-        // Tests if time completion is added to TotalTimeCompletion
-        // and checks if completedCount is incremented
-        Duration duration = Duration.between(itemComplete.getCreationDate(), itemComplete.getDoneDate());
-        assertEquals(duration, todoService.getTotalTimeCompletion());
-        assertEquals(1, todoService.getCompletedCount());
+        // Tests if time completion is added to highTimeCompletion
+        // and checks if highCompletedCount is incremented
+        Duration duration = Duration.between(testItem.getCreationDate(), testItem.getDoneDate());
+        assertEquals(duration, todoService.getHighTimeCompletion());
+        assertEquals(1, todoService.getHighCompletedCount());
     }
 
     @Test
     public void testUndoCompleteTodoItem(){
         String testString = "Undo TodoItem Test";
-        int priority = 0;
-        LocalDateTime dueDate = null;
-        Todo item = todoService.addTodo(testString, priority, dueDate);
-        item.setCreationDate(LocalDateTime.now().minusDays(3));
+        int priority = 2;
+        Todo testItem = todoService.addTodo(testString, priority, null);
+        testItem.setCreationDate(LocalDateTime.now().minusDays(3));
 
         //completes todo and grabs duration time
-        Todo itemComplete = todoService.completeTodoItem(item.getId());
-        Duration duration = Duration.between(itemComplete.getCreationDate(), itemComplete.getDoneDate());
-
+        todoService.completeTodoItem(testItem.getId());
+        Duration duration = Duration.between(testItem.getCreationDate(), testItem.getDoneDate());
 
         // undos completing the todo and verifies that it is marked not complete
-        Todo undoComplete = todoService.undoCompleteTodoItem(item.getId());
+        Todo undoComplete = todoService.undoCompleteTodoItem(testItem.getId());
         assertFalse(undoComplete.isCompleted());
         assertNull(undoComplete.getDoneDate());
 
         // Tests if time durationo time is subtracted from TotalTimeCompletion
         // and checks if completedCount is reduced by 1
-        assertEquals(Duration.ZERO, todoService.getTotalTimeCompletion());
-        assertEquals(0, todoService.getCompletedCount());
+        assertEquals(Duration.ZERO, todoService.getMediumTimeCompletion());
+        assertEquals(0, todoService.getMediumCompletedCount());
     }
 
-//    @Test
-//    public void testGetAvgTimeCompletion(){
-//
-//        // created 10 nodes and marks them completed
-//        Todo item1 = todoService.addTodo("Test Item 1", 0, null);
-//        item1.setCreationDate(LocalDateTime.now().minusDays(3));
-//        todoService.completeTodoItem(item1.getId());
-//
-//        Todo item2 = todoService.addTodo("Test Item 2", 0, null);
-//        item2.setCreationDate(LocalDateTime.now().minusHours(17));
-//        todoService.completeTodoItem(item2.getId());
-//
-//        Todo item3 = todoService.addTodo("Test Item 3", 0, null);
-//        item3.setCreationDate(LocalDateTime.now().minusMinutes(58));
-//        todoService.completeTodoItem(item3.getId());
-//
-//        // average 1 day, 5 hours, 59 minutes, 20 seconds
-//        String result = todoService.getAvgCompletionTime();
-//        assertEquals("Days: 1   Hours: 5   Minutes: 59   Seconds: 20", result);
-//    }
+    @Test
+    public void testGetAvgTimeCompletion(){
+        LocalDateTime testTime = LocalDateTime.now();
+
+        // created 10 nodes of each priority and marks them completed
+        for (int i = 1; i <= 30; i++){
+            String testString = "Add Me to the List: #" + i;
+            int priority;
+
+            if (i <= 10) priority = 1;
+            else if (i <= 20) priority = 2;
+            else priority = 3;
+
+            Todo testItem = todoService.addTodo(testString, priority, null);
+
+            if (i <= 10) testItem.setCreationDate(testTime.minusDays(i));
+            else if (i <= 20) testItem.setCreationDate(testTime.minusHours(i));
+            else testItem.setCreationDate(testTime.minusMinutes(i));
+
+            todoService.completeTodoItem(testItem.getId());
+        }
+
+        // times calculated using a time calculator
+        String correctOverall= "Days: 2   Hours: 1   Minutes: 18   Seconds: 30";
+        String correctHigh = "Days: 5   Hours: 12   Minutes: 0   Seconds: 0";
+        String correctMedium = "Days: 0   Hours: 15   Minutes: 30   Seconds: 0";
+        String correctLow = "Days: 0   Hours: 0   Minutes: 25   Seconds: 30";
+
+        String[] expected = {correctOverall, correctHigh, correctMedium, correctLow};
+        String[] results = todoService.getAvgCompletionTime();
+
+        for (int i = 0; i < expected.length; i++){
+            assertEquals(expected[i], results[i]);
+        }
+    }
 
 //    @Test
 //    public void testUpdateList(){
