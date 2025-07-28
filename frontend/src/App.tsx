@@ -21,8 +21,8 @@ interface Todo {
 function App() {
   // dummy todo data
   const [todos, setTodos] = useState<Todo[]>([
-      { id: '1', todoItem: 'Test item 1', priority: 2, dueDate:'2025-08-01T08:00', completed: false},
-      { id: '2', todoItem: 'Test item 2', priority: 1, dueDate: '', completed: false},
+      { id: '1', todoItem: 'Test item 1', priority: 2, creationDate: '', doneDate: '', dueDate:'2025-08-01T08:00', completed: false},
+      { id: '2', todoItem: 'Test item 2', priority: 1, creationDate: '', doneDate: '', dueDate: '', completed: false},
 
   ])
   const [AddModalOpen, setAddModalOpen] = useState(false);
