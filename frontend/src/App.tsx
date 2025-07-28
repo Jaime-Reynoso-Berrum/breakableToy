@@ -5,26 +5,29 @@ import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
+import TodoItem, {Todo} from './components/TodoItem';
 
 
-interface todo {
+interface Todo {
     id: string;
     todoItem: string;
     priority: number;
+    creationDate: string;
+    doneDate: string;
     dueDate: string | null;
     completed: boolean;
 }
 
 function App() {
   // dummy todo data
-  const [todos, setTodos] = useState<todo[]>([
+  const [todos, setTodos] = useState<Todo[]>([
       { id: '1', todoItem: 'Test item 1', priority: 2, dueDate:'2025-08-01T08:00', completed: false},
       { id: '2', todoItem: 'Test item 2', priority: 1, dueDate: '', completed: false},
 
   ])
   const [AddModalOpen, setAddModalOpen] = useState(false);
   const [EditModalOpen, setEditModalOpen] = useState(false);
-  const [EditingTodo, setEditingTodo] = useState<todo | null>(null);
+  const [EditingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const [queryFilter, setQueryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<number>(0);
@@ -37,7 +40,7 @@ function App() {
       setAddModalOpen(false);
   }
 
-  const openEditModal = (todo: todo) => {
+  const openEditModal = (todo: Todo) => {
       setEditingTodo(todo);
       setEditModalOpen(true);
 }
