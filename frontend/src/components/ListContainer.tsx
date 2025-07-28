@@ -1,4 +1,6 @@
-import TodoItem, {Todo} from './TodoItem';
+import TodoItem from './TodoItem';
+import type {Todo} from './TodoItem';
+
 
 
 

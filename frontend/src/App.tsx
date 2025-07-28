@@ -5,18 +5,8 @@ import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
-import TodoItem, {Todo} from './components/TodoItem';
+import type {Todo} from './components/TodoItem';
 
-
-interface Todo {
-    id: string;
-    todoItem: string;
-    priority: number;
-    creationDate: string;
-    doneDate: string;
-    dueDate: string | null;
-    completed: boolean;
-}
 
 function App() {
   // dummy todo data
