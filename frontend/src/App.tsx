@@ -3,6 +3,7 @@ import './App.css'
 import AddTodoModal from "./components/modals/AddTodoModal.tsx";
 import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
+import MetricsFooter from "./components/MetricsFooter.tsx";
 
 
 interface todo {
@@ -26,6 +27,7 @@ function App() {
   const [queryFilter, setQueryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<number>(0);
   const [completedFilter, setCompletedFilter] = useState<boolean | null>(null);
+  const [avgTime, setAvgTime] = useState("00:00:00")
 
   const handleAdd = (todoItem: string, priority: number, dueDate: string | null) => {
       console.log("New todo: ", {todoItem, priority, dueDate });
@@ -94,6 +96,7 @@ function App() {
                 />
             )}
         </div>
+        <MetricsFooter avgCompletioTime={avgTime} />
     </>
   )
 }
