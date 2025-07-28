@@ -1,23 +1,28 @@
-import {Todo} from './TodoItem';
+import TodoItem, {Todo} from './TodoItem';
 
 
 
 type TodoItemProps = {
-    todos: TodoItem[];
+    todos: Todo[];
     onToggleCompleted: (id: string) => void;
     onEdit: (todo: Todo) => void;
 };
 
-function TodoItem(props: TodoItemProps){
+function ListContainer(props: TodoItemProps){
     const {todos, onToggleCompleted, onEdit} = props;
 
     return(
         <div>
             {todos.map((todo) => (
-                <span> [todo.todoItem]</span>
+                <TodoItem
+                    key= {todo.id}
+                    todo = {todo}
+                    onToggleCompleted={onToggleCompleted}
+                    onEdit = {onEdit}
+                />
             ))}
         </div>
     )
 }
 
-export default TodoItem;
+export default ListContainer;

@@ -56,7 +56,7 @@ function App() {
     }
 
     const onToggleCompleted = (id: string) => {
-      const setComplete = todos.map((todo) => {
+      const updatedTodos = todos.map((todo) => {
           if (todo.id === id) {
               return {
                   id: todo.id,
@@ -64,9 +64,11 @@ function App() {
                   priority: todo.priority,
                   dueDate: todo.dueDate,
                   completed: !todo.completed
-              }
+              };
           }
-      })
+          return todo;
+      });
+      setTodos(updatedTodos);
     }
 
   return (
