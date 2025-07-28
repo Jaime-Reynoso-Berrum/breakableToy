@@ -4,6 +4,7 @@ import AddTodoModal from "./components/modals/AddTodoModal.tsx";
 import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
+import ListContainer from "./components/ListContainer.tsx";
 
 
 interface todo {
@@ -11,13 +12,14 @@ interface todo {
     todoItem: string;
     priority: number;
     dueDate: string | null;
+    completed: boolean;
 }
 
 function App() {
   // dummy todo data
   const [todos, setTodos] = useState<todo[]>([
-      { id: '1', todoItem: 'Test item 1', priority: 2, dueDate:'2025-08-01T08:00'},
-      { id: '2', todoItem: 'Test item 2', priority: 1, dueDate: ''},
+      { id: '1', todoItem: 'Test item 1', priority: 2, dueDate:'2025-08-01T08:00', completed: false},
+      { id: '2', todoItem: 'Test item 2', priority: 1, dueDate: '', completed: false},
 
   ])
   const [AddModalOpen, setAddModalOpen] = useState(false);
@@ -53,6 +55,20 @@ function App() {
         console.log({queryFilter, priorityFilter, completedFilter});
     }
 
+    const onToggleCompleted = (id: string) => {
+      const setComplete = todos.map((todo) => {
+          if (todo.id === id) {
+              return {
+                  id: todo.id,
+                  todoItem: todo.todoItem,
+                  priority: todo.priority,
+                  dueDate: todo.dueDate,
+                  completed: !todo.completed
+              }
+          }
+      })
+    }
+
   return (
     <>
         <FilterBar
@@ -68,6 +84,11 @@ function App() {
             <button style = {{ border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
 
 
+            <ListContainer
+                todos={todos}
+                onToggleCompleted={onToggleCompleted}
+                onEdit={openEditModal}
+            />
             <ul>
                 {todos.map((todo) => (
                     <li key={todo.id}>

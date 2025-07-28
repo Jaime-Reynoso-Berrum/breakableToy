@@ -5,21 +5,16 @@ import {Todo} from './TodoItem';
 type TodoItemProps = {
     todos: TodoItem[];
     onToggleCompleted: (id: string) => void;
-    onEdit: (todo: TodoItem) => void;
+    onEdit: (todo: Todo) => void;
 };
 
 function TodoItem(props: TodoItemProps){
-    const {Todo} = props;
+    const {todos, onToggleCompleted, onEdit} = props;
 
     return(
         <div>
-            {Todo.map((todo) => (
-                <TodoItem
-                    id = {Todo.id}
-                    todoItem: {Todo.todoItem}
-                    onToggleCompleted = {onToggleCompleted}
-                    onEdit={onEdit}
-                />
+            {todos.map((todo) => (
+                <span> [todo.todoItem]</span>
             ))}
         </div>
     )
