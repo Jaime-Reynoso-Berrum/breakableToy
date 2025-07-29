@@ -6,6 +6,7 @@ import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
 import type {Todo} from './components/TodoItem';
+import {addTodo} from "./api/api.ts";
 
 
 function App() {
@@ -24,9 +25,20 @@ function App() {
   const [completedFilter, setCompletedFilter] = useState<boolean | null>(null);
   const [avgTime, setAvgTime] = useState("00:00:00")
 
-  const handleAdd = (todoItem: string, priority: number, dueDate: string | null) => {
+  const handleAdd = async (todoItem: string, priority: number, dueDate: string | null) => {
       console.log("New todo: ", {todoItem, priority, dueDate });
-      // api calls will go in here
+
+      try {
+          const newTodo = await addTodo({
+              todoItem,
+              priority,
+              dueDate,
+          });
+
+          setTodos(prev => [...prev, newTodo]);
+      } catch (error) {
+          console.error("Error adding Todo", error);
+      }
       setAddModalOpen(false);
   }
 
@@ -84,16 +96,7 @@ function App() {
                 onToggleCompleted={onToggleCompleted}
                 onEdit={openEditModal}
             />
-            <ul>
-                {todos.map((todo) => (
-                    <li key={todo.id}>
-                        <strong>{todo.todoItem}</strong> (Priority: {todo.priority})
-                        <button style = {{ border: '1px solid black', marginLeft: 10}} onClick={() => openEditModal(todo)}>
-                            Edit/Delete
-                        </button>
-                    </li>
-                    ))}
-            </ul>
+
 
             {AddModalOpen && (
                 <AddTodoModal

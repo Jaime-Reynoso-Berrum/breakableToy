@@ -1,5 +1,6 @@
 package com.encoraSpark.todoWebApp.controller;
 
+import com.encoraSpark.todoWebApp.dto.TodoInput;
 import com.encoraSpark.todoWebApp.model.Todo;
 import com.encoraSpark.todoWebApp.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api/todos")
 public class TodoController {
@@ -18,10 +20,10 @@ public class TodoController {
 
     // adds a todo item
     @PostMapping
-    public Todo addTodo(@RequestParam String todoItem,
-                        @RequestParam int priority,
-                        @RequestParam LocalDateTime dueDate) {
-        return todoService.addTodo(todoItem, priority, dueDate);
+    public Todo addTodo(@RequestParam TodoInput todoInput) {
+        return todoService.addTodo(todoInput.getTodoItem(),
+                                   todoInput.getPriority(),
+                                   todoInput.getDueDate());
     }
 
     // edits a todoo item
@@ -35,13 +37,13 @@ public class TodoController {
     }
 
     // complete a todo item
-    @PostMapping("/{id}/complete")
+    @PostMapping("/complete/{id}")
     public Todo completeTodoItem(@PathVariable UUID id) {
         return todoService.completeTodoItem(id);
     }
 
     // undos marking an item as complete
-    @PostMapping("/{id}/undo")
+    @PostMapping("/undo/{id}")
     public Todo undoCompleteItem(@PathVariable UUID id) {
         return todoService.undoCompleteTodoItem(id);
     }

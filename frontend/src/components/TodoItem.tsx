@@ -4,8 +4,8 @@ export type Todo = {
     todoItem: string;
     priority: number;
     creationDate: string;
-    doneDate: string;
     dueDate: string | null;
+    doneDate: string;
     completed: boolean;
 };
 
@@ -19,7 +19,7 @@ function TodoItem(props : TodoItemProps){
     const { todo, onToggleCompleted, onEdit } = props;
 
     return(
-        <div>
+        <div style = {{ display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid black'}}>
             <input
                 type = 'checkbox'
                 checked = {todo.completed}
@@ -28,7 +28,7 @@ function TodoItem(props : TodoItemProps){
             <p><strong>{todo.todoItem}</strong></p>
             <p><strong>{todo.priority}</strong></p>
             <p><strong>{todo.dueDate ? todo.dueDate : "No due date"}</strong></p>
-            <button onClick = {() => onEdit(todo)}> Edit/Delete</button>
+            <button style = {{border: '1px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
         </div>
     );
 }

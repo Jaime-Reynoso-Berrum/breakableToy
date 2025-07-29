@@ -14,7 +14,7 @@ function ListContainer(props: TodoItemProps){
     const {todos, onToggleCompleted, onEdit} = props;
 
     return(
-        <div>
+        <div style = {{border: '1px solid black'}}>
             {todos.map((todo) => (
                 <TodoItem
                     key= {todo.id}
