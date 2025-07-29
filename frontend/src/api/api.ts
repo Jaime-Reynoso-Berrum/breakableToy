@@ -3,12 +3,14 @@ import type {Todo} from "../components/TodoItem"
 const BASE_URL = "http://localhost:9090/api/todos";
 
 //adds a todo item
-export async function addTodo(Todo: Omit<Todo, "id" | "creationDate" | "doneDate" | "completed">): Promise<Todo> {
-    const response = await fetch('${BASE_URL}', {
+export async function addTodo(todo: Omit<Todo, "id" | "creationDate" | "doneDate" | "completed">): Promise<Todo> {
+    const response = await fetch(BASE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Todo),
+        body: JSON.stringify(todo),
     });
+
+
     if (!response.ok) throw new Error("Failed to ad task");
     return response.json();
 }

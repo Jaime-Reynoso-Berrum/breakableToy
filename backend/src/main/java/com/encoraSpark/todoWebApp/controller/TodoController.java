@@ -20,10 +20,14 @@ public class TodoController {
 
     // adds a todo item
     @PostMapping
-    public Todo addTodo(@RequestParam TodoInput todoInput) {
+    public Todo addTodo(@RequestBody TodoInput todoInput) {
+        LocalDateTime dueDate = null;
+        if (todoInput.getDueDate() != null) {
+            dueDate = LocalDateTime.parse(todoInput.getDueDate());
+        }
         return todoService.addTodo(todoInput.getTodoItem(),
                                    todoInput.getPriority(),
-                                   todoInput.getDueDate());
+                                   dueDate);
     }
 
     // edits a todoo item
