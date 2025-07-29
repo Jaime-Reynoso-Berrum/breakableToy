@@ -137,13 +137,16 @@ public class TodoService {
     }
 
     //sorts todo objects by their due date and priority
-    public List<Todo> sortedTodos(List<Todo> filteredList, boolean ascending, boolean sortByDuedate){
+    public List<Todo> sortedTodos(List<Todo> filteredList, Boolean ascending, Boolean sortByDuedate){
         List<Todo> sortedList = new ArrayList<>(filteredList);
+
 
         Comparator<Todo> comparator = new Comparator<Todo>() {
             @Override
             public int compare(Todo item1, Todo item2) {
                 int result;
+
+                if (ascending == null && sortByDuedate == null) { return 0; }
 
                 // sorts by due date first, and then by priority
                 if (sortByDuedate) {
@@ -192,8 +195,6 @@ public class TodoService {
 
         //filters the list based on 3 parameters, and then sorts it
         filteredList = filterTodos(query, priorityFilter, completed);
-
-        if (sortByDueDate == null && ascending == null) { return filteredList;}
 
         return sortedTodos(filteredList, ascending, sortByDueDate);
     }

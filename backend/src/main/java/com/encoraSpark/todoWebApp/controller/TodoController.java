@@ -46,18 +46,23 @@ public class TodoController {
         return todoService.undoCompleteTodoItem(id);
     }
 
-    // filter and sorts the todo list
-//    @GetMapping
-//    public List<Todo> updateTodoList (@RequestParam(required = false, defaultValue = "") String query,
-//                                      @RequestParam(required = false, defaultValue = "0") int priorityFilter,
-//                                      @RequestParam(required = false) Boolean completed,
-//                                      @RequestParam(required = false, defaultValue = "true") boolean ascending) {
-//        return todoService.updateList(query, priorityFilter, completed, ascending);
-//    }
+    // grabs the average completion time metrics
+    @GetMapping("/averageCompletionTime")
+    public String[] getAvgCompletionTime() {
+        return todoService.getAvgCompletionTime();
+    }
 
-    // grabs the average completion time
-//    @GetMapping("/averageCompletionTime")
-//    public String getAvgCompletionTime() {
-//        return todoService.getAvgCompletionTime();
-//    }
+    @GetMapping("/filter")
+    public List<Todo> getFilteredTodos(@RequestParam(required = false, defaultValue = "") String query,
+                                       @RequestParam(required = false, defaultValue = "0") int priorityFilter,
+                                       @RequestParam(required = false) Boolean completed) {
+            return todoService.filterTodos(query, priorityFilter, completed);
+    }
+
+    @GetMapping("/sort")
+    public List<Todo> getSortedTodos(@RequestParam List<Todo> filteredList,
+                                     @RequestParam(defaultValue = "true") boolean ascending,
+                                     @RequestParam(defaultValue = "true") Boolean sortByDueDate) {
+        return todoService.sortedTodos(filteredList, ascending, sortByDueDate);
+    }
 }
