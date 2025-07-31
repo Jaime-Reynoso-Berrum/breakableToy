@@ -1,17 +1,14 @@
 import TodoItem from './TodoItem';
-import type {Todo} from './TodoItem';
-
-
-
+import type {Todo} from "../types/AddTodoRequest.tsx";
 
 type TodoItemProps = {
     todos: Todo[];
-    onToggleCompleted: (id: string) => void;
+    CompleteItem: (id: string) => void;
     onEdit: (todo: Todo) => void;
 };
 
 function ListContainer(props: TodoItemProps){
-    const {todos, onToggleCompleted, onEdit} = props;
+    const {todos, CompleteItem, onEdit} = props;
 
     return(
         <div style = {{border: '1px solid black'}}>
@@ -19,7 +16,7 @@ function ListContainer(props: TodoItemProps){
                 <TodoItem
                     key= {todo.id}
                     todo = {todo}
-                    onToggleCompleted={onToggleCompleted}
+                    CompleteItem={CompleteItem}
                     onEdit = {onEdit}
                 />
             ))}

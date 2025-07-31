@@ -57,7 +57,7 @@ public class TodoController {
 
     // grabs the average completion time metrics
     @GetMapping("/averageCompletionTime")
-    public String[] getAvgCompletionTime() {
+    public String[] getMetrics() {
         return todoService.getAvgCompletionTime();
     }
 

@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import './App.css'
 import AddTodoModal from "./components/modals/AddTodoModal.tsx";
 import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
-import {addTodo, completeTodo, editTodo, undoCompleteTodo} from "./api/api.ts";
+import {addTodo, completeTodo, editTodo, getMetrics, undoCompleteTodo} from "./api/api.ts";
 import type {Todo} from "./types/AddTodoRequest.tsx";
 
 
@@ -23,7 +23,19 @@ function App() {
   const [queryFilter, setQueryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<number>(0);
   const [completedFilter, setCompletedFilter] = useState<boolean | null>(null);
-  const [avgTime, setAvgTime] = useState("00:00:00")
+  const [metrics, setMetrics] = useState<string[]>([]);
+
+  useEffect(() => {
+      const metricsOnLaunch = async () => {
+          try {
+              const data = await getMetrics();
+              setMetrics(data);
+          } catch (error){
+              console.log("Failed to grab metrics", error);
+          }
+      };
+      metricsOnLaunch();
+  }, []);
 
   const handleAdd = async (todoItem: string, priority: number, dueDate: string | null) => {
       console.log("New todo: ", {todoItem, priority, dueDate });
@@ -84,6 +96,8 @@ function App() {
           } else {
               updatedTodo = await undoCompleteTodo(id);
           }
+          const updatedMetrics = await getMetrics();
+          setMetrics(updatedMetrics);
 
           setTodos(prev => prev.map(todo => (todo.id === id ? updatedTodo : todo))
           );
@@ -131,7 +145,7 @@ function App() {
                 />
             )}
         </div>
-        <MetricsFooter avgCompletioTime={avgTime} />
+        <MetricsFooter metrics={metrics} />
     </>
   )
 }

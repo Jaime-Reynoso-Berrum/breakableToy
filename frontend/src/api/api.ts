@@ -42,3 +42,8 @@ export async function undoCompleteTodo(id: string): Promise<Todo> {
     });
     return response.json();
 }
+
+export async function getMetrics(): Promise<string[]> {
+    const response = await fetch(`${BASE_URL}/averageCompletionTime`);
+    return response.json();
+}
