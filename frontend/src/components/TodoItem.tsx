@@ -1,13 +1,5 @@
+import type {Todo} from "../types/AddTodoRequest.tsx";
 
-export type Todo = {
-    id: string;
-    todoItem: string;
-    priority: number;
-    creationDate: string;
-    dueDate: string | null;
-    doneDate: string;
-    completed: boolean;
-};
 
 type TodoItemProps = {
     todo: Todo;

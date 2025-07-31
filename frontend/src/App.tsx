@@ -5,15 +5,15 @@ import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
-import type {Todo} from './components/TodoItem';
-import {addTodo} from "./api/api.ts";
+import {addTodo, editTodo} from "./api/api.ts";
+import type {Todo} from "./types/AddTodoRequest.tsx";
 
 
 function App() {
   // dummy todo data
   const [todos, setTodos] = useState<Todo[]>([
-      { id: '1', todoItem: 'Test item 1', priority: 2, creationDate: '', doneDate: '', dueDate:'2025-08-01T08:00', completed: false},
-      { id: '2', todoItem: 'Test item 2', priority: 1, creationDate: '', doneDate: '', dueDate: '', completed: false},
+      { id: '1', todoItem: 'Test item 1', priority: 2, creationDate: '', doneDate: '', dueDate:'2025-08-01T08:00', completed: false, deleteFlag: false},
+      { id: '2', todoItem: 'Test item 2', priority: 1, creationDate: '', doneDate: '', dueDate: '', completed: false, deleteFlag:false},
 
   ])
   const [AddModalOpen, setAddModalOpen] = useState(false);
@@ -29,11 +29,7 @@ function App() {
       console.log("New todo: ", {todoItem, priority, dueDate });
 
       try {
-          const newTodo = await addTodo({
-              todoItem,
-              priority,
-              dueDate,
-          });
+          const newTodo = await addTodo({todoItem, priority, dueDate,});
 
           setTodos(prev => [...prev, newTodo]);
       } catch (error) {
@@ -46,13 +42,23 @@ function App() {
       setEditingTodo(todo);
       setEditModalOpen(true);
 }
-  const handleEdit = ( id: string, todoItem: string, priority: number, dueDate: string, deleteFlag: boolean) => {
+  const handleEdit = async ( id: string, todoItem: string, priority: number, dueDate: string, deleteFlag: boolean) => {
       console.log('Editing todo item: ', {id, todoItem, priority, dueDate, deleteFlag });
 
-      //api call here
+      // try {
+          const editedTodo: Todo = await editTodo(id, {todoItem, priority, dueDate, delete: deleteFlag,});
 
-        setEditModalOpen(false);
-        setEditingTodo(null);
+          if(deleteFlag) {
+              setTodos(prev => prev.filter(todo => todo.id !== id));
+          } else if  (editedTodo) {
+              setTodos(prev => prev.map(todo => (todo.id === id ? editedTodo: todo)));
+          }
+      // } catch (error) {
+          // console.error("Error edditing Todo", error);
+      //
+      setEditModalOpen(false);
+      setEditingTodo(null);
+
     }
 
     const handleOnFilter = () => {

@@ -1,5 +1,6 @@
 package com.encoraSpark.todoWebApp.controller;
 
+import com.encoraSpark.todoWebApp.dto.TodoEdit;
 import com.encoraSpark.todoWebApp.dto.TodoInput;
 import com.encoraSpark.todoWebApp.model.Todo;
 import com.encoraSpark.todoWebApp.service.TodoService;
@@ -21,23 +22,25 @@ public class TodoController {
     // adds a todo item
     @PostMapping
     public Todo addTodo(@RequestBody TodoInput todoInput) {
-        LocalDateTime dueDate = null;
-        if (todoInput.getDueDate() != null) {
-            dueDate = LocalDateTime.parse(todoInput.getDueDate());
-        }
+        System.out.println(todoInput.getTodoItem());
+
         return todoService.addTodo(todoInput.getTodoItem(),
                                    todoInput.getPriority(),
-                                   dueDate);
+                                   todoInput.getDueDate());
     }
 
     // edits a todoo item
     @PutMapping("/{id}")
     public Todo editTodo(@PathVariable UUID id,
-                         @RequestParam String todoItem,
-                         @RequestParam int priority,
-                         @RequestParam LocalDateTime dueDate,
-                         @RequestParam Boolean delete) {
-        return todoService.editTodo(id, todoItem, priority, dueDate, delete);
+                         @RequestBody TodoEdit todoEdit) {
+
+
+        System.out.println(todoEdit.getTodoItem());
+        return todoService.editTodo(id,
+                                    todoEdit.getTodoItem(),
+                                    todoEdit.getPriority(),
+                                    todoEdit.getDueDate(),
+                                    todoEdit.getDeleted());
     }
 
     // complete a todo item

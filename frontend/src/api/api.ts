@@ -1,27 +1,29 @@
-import type {Todo} from "../components/TodoItem"
+import type {EditTodoRequest} from "../types/EditTodoRequest.tsx";
+import type {Todo} from "../types/AddTodoRequest.tsx";
 
 const BASE_URL = "http://localhost:9090/api/todos";
 
 //adds a todo item
-export async function addTodo(todo: Omit<Todo, "id" | "creationDate" | "doneDate" | "completed">): Promise<Todo> {
+export async function addTodo(todo: Omit<Todo, "id" | "creationDate" | "doneDate" | "completed" | "deleteFlag">): Promise<Todo> {
     const response = await fetch(BASE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(todo),
     });
 
-
-    if (!response.ok) throw new Error("Failed to ad task");
+    if (!response.ok) throw new Error("Failed to add task");
     return response.json();
 }
 
 //edits a todo item
-export async function editTodo(id: string, updated: Partial<Todo>): Promise<Todo> {
-    const response = await fetch(`${BASE_URL}/edit/${id}`, {
+export async function editTodo(id: string, updated: EditTodoRequest): Promise<Todo> {
+    const response = await fetch(`${BASE_URL}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
     });
+    if (!response.ok) throw new Error("Failed to add task");
+
     return response.json();
 }
 
