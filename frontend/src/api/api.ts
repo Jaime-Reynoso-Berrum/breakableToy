@@ -30,7 +30,15 @@ export async function editTodo(id: string, updated: EditTodoRequest): Promise<To
 // completes a todo item
 export async function completeTodo(id: string): Promise<Todo> {
     const response = await fetch(`${BASE_URL}/complete/${id}`, {
-        method: "PUT",
+        method: "POST",
+    });
+    return response.json();
+}
+
+// uncompletes a todo item
+export async function undoCompleteTodo(id: string): Promise<Todo> {
+    const response = await fetch(`${BASE_URL}/undo/${id}`, {
+        method: "POST",
     });
     return response.json();
 }

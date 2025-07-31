@@ -4,7 +4,7 @@ export type Todo = {
     priority: number;
     creationDate: string;
     dueDate: string | null;
-    doneDate: string;
+    doneDate: string | null;
     completed: boolean;
     deleteFlag: false;
 };

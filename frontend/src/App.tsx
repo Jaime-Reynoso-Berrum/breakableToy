@@ -5,7 +5,7 @@ import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
-import {addTodo, editTodo} from "./api/api.ts";
+import {addTodo, completeTodo, editTodo, undoCompleteTodo} from "./api/api.ts";
 import type {Todo} from "./types/AddTodoRequest.tsx";
 
 
@@ -42,20 +42,26 @@ function App() {
       setEditingTodo(todo);
       setEditModalOpen(true);
 }
-  const handleEdit = async ( id: string, todoItem: string, priority: number, dueDate: string, deleteFlag: boolean) => {
+  const handleEdit = async ( id: string, todoItem: string, priority: number, dueDate: string, deleteFlag: boolean = false) => {
       console.log('Editing todo item: ', {id, todoItem, priority, dueDate, deleteFlag });
 
-      // try {
-          const editedTodo: Todo = await editTodo(id, {todoItem, priority, dueDate, delete: deleteFlag,});
+      try {
+          const editedTodo: Todo = await editTodo(id, {
+                                                  todoItem,
+                                                  priority,
+                                                  dueDate: dueDate.trim() === "" ? null : dueDate,
+                                                  deleted: deleteFlag,
+          });
 
           if(deleteFlag) {
               setTodos(prev => prev.filter(todo => todo.id !== id));
           } else if  (editedTodo) {
               setTodos(prev => prev.map(todo => (todo.id === id ? editedTodo: todo)));
           }
-      // } catch (error) {
-          // console.error("Error edditing Todo", error);
-      //
+      } catch (error) {
+          console.error("Error edditing Todo", error);
+      }
+
       setEditModalOpen(false);
       setEditingTodo(null);
 
@@ -66,21 +72,25 @@ function App() {
         console.log({queryFilter, priorityFilter, completedFilter});
     }
 
-    const onToggleCompleted = (id: string) => {
-      const updatedTodos = todos.map((todo) => {
-          if (todo.id === id) {
-              return {
-                  id: todo.id,
-                  todoItem: todo.todoItem,
-                  priority: todo.priority,
-                  dueDate: todo.dueDate,
-                  completed: !todo.completed
-              };
+    const CompleteItem = async (id: string) => {
+      const todo  = todos.find(todo => todo.id === id);
+      if (!todo) return;
+
+      try {
+          let updatedTodo: Todo;
+
+          if (!todo.completed){
+              updatedTodo = await completeTodo(id);
+          } else {
+              updatedTodo = await undoCompleteTodo(id);
           }
-          return todo;
-      });
-      setTodos(updatedTodos);
-    }
+
+          setTodos(prev => prev.map(todo => (todo.id === id ? updatedTodo : todo))
+          );
+      } catch (error){
+          console.error("Failed to toggle complete", error);
+      }
+  }
 
   return (
     <>
@@ -99,7 +109,7 @@ function App() {
 
             <ListContainer
                 todos={todos}
-                onToggleCompleted={onToggleCompleted}
+                CompleteItem={CompleteItem}
                 onEdit={openEditModal}
             />
 
