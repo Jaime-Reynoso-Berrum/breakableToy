@@ -18,7 +18,7 @@ public class TodoService {
     public Duration highTimeCompletion = Duration.ZERO;
     public Duration mediumTimeCompletion = Duration.ZERO;
     public Duration lowTimeCompletion = Duration.ZERO;
-    private String currentQuery = "";
+    private String currentQueryFilter = "";
     private int currentPriorityFilter = 0;
     private Boolean currentCompleted = null;
     private boolean currentAscending = true;
@@ -105,34 +105,21 @@ public class TodoService {
         return new String[]{avgTotalTime, avgHighTime, avgMediumTime, avgLowTime};
     }
 
-    //filters todo items based on query search, priority, and completed status
-    public List<Todo> filterTodos(String query, int priority, Boolean completed){
-        List<Todo> finalList = new ArrayList<>();
+    public List<Todo> setQueryFilter(String queryFilter){
+        currentQueryFilter = queryFilter;
+        updateList();
+        return finalList;
+    }
 
-        // adds todoItem to finalList based on filter options
-        for(Todo todoItem : todoItems.values()) {
+    public List<Todo> setPriorityFilter(int priorityFilter){
+        currentPriorityFilter = priorityFilter;
+        updateList();
+        return finalList;
+    }
 
-            //filters results by query search
-            if(query != null && !query.isEmpty()) {
-                String lowerCaseQuery = query.toLowerCase();
-                String lowerCaseTodoItem = todoItem.getTodoItem().toLowerCase();
-
-                if(!lowerCaseTodoItem.contains(lowerCaseQuery)) {
-                    continue;
-                }
-            }
-
-            // filters results by priority
-            if (priority != 0 && todoItem.getPriority() != priority) {
-                continue;
-            }
-
-            // filters results by completed, not completed, or all
-            if (completed != null && todoItem.isCompleted() != completed) {
-                continue;
-            }
-            finalList.add(todoItem);
-        }
+    public List<Todo> setCompletedFilter(Boolean completedFilter){
+        currentCompleted = completedFilter;
+        updateList();
         return finalList;
     }
 
@@ -180,29 +167,72 @@ public class TodoService {
     // region **** Helper Methods ****
 
     private void updateList(){
-        finalList = updateList(currentQuery, currentPriorityFilter, currentCompleted, currentAscending, currentSortByDueDate);
+        finalList = rebuildFinalList();
     }
 
-    //updates page with the current todo items
-    private List<Todo> updateList(String query, int priorityFilter, Boolean completed, Boolean ascending, Boolean sortByDueDate){
-        // saves variables for reuse
-        currentQuery = query;
-        currentPriorityFilter = priorityFilter;
-        currentCompleted = completed;
-        currentAscending = ascending;
-        currentSortByDueDate = sortByDueDate;
-
-
-        //filters the list based on 3 parameters, and then sorts it
-        filteredList = filterTodos(query, priorityFilter, completed);
-
-        return sortedTodos(filteredList, ascending, sortByDueDate);
+    private List<Todo> rebuildFinalList(){
+        List<Todo> result = new ArrayList<>(originalList);
+        result = filterByQuery(result, currentQueryFilter);
+        result = filterByPriority(result, currentPriorityFilter);
+        result = filterByComplete(result, currentCompleted);
+        result = sortedTodos(result, currentAscending, currentSortByDueDate);
+        return result;
     }
 
     // grabs the current filtered and sorted list
     private List<Todo> getFinalList(){
         return new ArrayList<>(finalList);
     }
+
+    // filters todo list by query
+    private List<Todo> filterByQuery(List<Todo> list, String query){
+        if(query == null && query.isEmpty()) return list;
+
+        List<Todo> queryList = new ArrayList<>();
+
+        String lowerCaseQuery = query.toLowerCase();
+        for (Todo todo: list){
+            if (todo.getTodoItem().toLowerCase().contains(lowerCaseQuery)) {
+                queryList.add(todo);
+            }
+        }
+        return queryList;
+    }
+
+    // filters todos list by priority
+    private List<Todo> filterByPriority(List<Todo> list, int priority){
+        if(priority == 0) return list;
+
+        List<Todo> priorityList = new ArrayList<>();
+
+        for (Todo todo: list){
+            if (todo.getPriority() == priority) {
+                priorityList.add(todo);
+            }
+        }
+        return priorityList;
+    }
+
+    // filters todo list by completed or not
+    private List<Todo> filterByComplete(List<Todo> list, Boolean completed){
+        if(completed == null) return list;
+
+        List<Todo>  completedList = new ArrayList<>();
+
+        for (Todo todo: list){
+            if (todo.isCompleted() == completed){
+                completedList.add(todo);
+            }
+        }
+        return completedList;
+    }
+
+
+
+
+
+
+
 
     // compares due dates of two items to sort them
     private int sortByDueDate(Todo item1, Todo item2){
