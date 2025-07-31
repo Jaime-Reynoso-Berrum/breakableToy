@@ -61,11 +61,19 @@ public class TodoController {
         return todoService.getAvgCompletionTime();
     }
 
-    @GetMapping("/filter")
-    public List<Todo> getFilteredTodos(@RequestParam(required = false, defaultValue = "") String query,
-                                       @RequestParam(required = false, defaultValue = "0") int priorityFilter,
-                                       @RequestParam(required = false) Boolean completed) {
-            return todoService.filterTodos(query, priorityFilter, completed);
+    @GetMapping("/filter/query")
+    public List<Todo> getQueryFilter(@RequestParam String queryFilter) {
+            return todoService.setQueryFilter(queryFilter);
+    }
+
+    @GetMapping("/filter/priority")
+    public List<Todo> getPriorityFilter(@RequestParam int priorityFilter) {
+        return todoService.setPriorityFilter(priorityFilter);
+    }
+
+    @GetMapping("/filter/completed")
+    public List<Todo> getCompletedFilter(@RequestParam Boolean completed) {
+        return todoService.setCompletedFilter(completed);
     }
 
     @GetMapping("/sort")

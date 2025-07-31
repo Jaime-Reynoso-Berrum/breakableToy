@@ -227,13 +227,6 @@ public class TodoService {
         return completedList;
     }
 
-
-
-
-
-
-
-
     // compares due dates of two items to sort them
     private int sortByDueDate(Todo item1, Todo item2){
         LocalDateTime date1 = item1.getDueDate();
