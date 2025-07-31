@@ -47,3 +47,13 @@ export async function getMetrics(): Promise<string[]> {
     const response = await fetch(`${BASE_URL}/averageCompletionTime`);
     return response.json();
 }
+
+export async function filterByQuery(query: string): Promise<Todo[]> {
+    const encodedQuery = encodeURIComponent(query);
+    const response = await fetch(`${BASE_URL}/filter/query?query=${encodedQuery}`, {
+        headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) throw new Error("Failed to filter todos by query");
+
+    return response.json();
+}

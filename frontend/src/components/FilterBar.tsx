@@ -6,7 +6,7 @@ type FilterBarProps = {
     setPriorityFilter: (priority: number) => void;
     completedFilter: boolean | null;
     setCompletedFilter: (completed: boolean | null) => void;
-    onFilter: () => void;
+    onQueryFilter: () => void;
 }
 
 function FilterBar ({
@@ -16,7 +16,7 @@ function FilterBar ({
     setPriorityFilter,
     completedFilter,
     setCompletedFilter,
-    onFilter
+    onQueryFilter
 }: FilterBarProps) {
     const handleCompletedChange = (event: React.ChangeEvent<HTMLSelectElement>)=> {
         const value = event.target.value;
@@ -59,7 +59,7 @@ function FilterBar ({
                 <option value = 'false'>All Uncompleted Items</option>
             </select>
 
-            <button style = {{ border: '1px solid black', marginLeft: 10}} onClick = {onFilter}>Filter Items</button>
+            <button style = {{ border: '1px solid black', marginLeft: 10}} onClick = {onQueryFilter}>Search</button>
         </div>
     )
 

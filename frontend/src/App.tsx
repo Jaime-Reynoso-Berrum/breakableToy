@@ -5,7 +5,7 @@ import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
-import {addTodo, completeTodo, editTodo, getMetrics, undoCompleteTodo} from "./api/api.ts";
+import {addTodo, completeTodo, editTodo, filterByQuery, getMetrics, undoCompleteTodo} from "./api/api.ts";
 import type {Todo} from "./types/AddTodoRequest.tsx";
 
 
@@ -79,9 +79,9 @@ function App() {
 
     }
 
-    const handleOnFilter = () => {
-      // api call goes here
-        console.log({queryFilter, priorityFilter, completedFilter});
+    const handleQueryFilter = async () => {
+      const filtered = await filterByQuery(queryFilter);
+      setTodos(filtered);
     }
 
     const CompleteItem = async (id: string) => {
@@ -115,7 +115,7 @@ function App() {
         setPriorityFilter={setPriorityFilter}
         completedFilter={completedFilter}
         setCompletedFilter={setCompletedFilter}
-        onFilter={handleOnFilter}
+        onQueryFilter={handleQueryFilter}
         />
         <div>
             <button style = {{ border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
