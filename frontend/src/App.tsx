@@ -137,16 +137,17 @@ function App() {
                 style={{
                     position:'fixed',
                     top: '150px',
+                    left: 0,
+                    right: 0,
                     zIndex: 1050,
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '0.5rem 1rem',
+                    padding: '0.5rem 2rem',
 
                 }}>
                 <button style = {{ marginRight: '15rem', border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
 
-                <div style={{display: 'flex', justifyContent: 'flex-end', gap: '0.5rem'}}>
+                <div style={{marginLeft: 'auto', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem'}}>
                     <button onClick={() => setSortByDueDate(prev => !prev)} style = {{ marginRight: '8px', border: '1px solid black'}}>
                         Sort by: {sortByDueDate ? "Due Date" : "Priority"}
                     </button>
@@ -158,7 +159,6 @@ function App() {
             </div>
 
         <div>
-            <h1>My Todo List</h1>
             <ListContainer
                 todos={todos}
                 CompleteItem={CompleteItem}

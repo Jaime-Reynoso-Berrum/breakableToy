@@ -63,7 +63,7 @@ function TodoItem(props : TodoItemProps){
             <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{priorityWordMap(todo.priority)}</strong></div>
 
             <div style={{ borderRight: '1px solid black', padding: '8px'}} title = {formatDueDate(todo.dueDate)}><strong>{formatDueDate(todo.dueDate)}</strong></div>
-            <button style = {{ padding: '2px 4px', cursor: 'pointer', border: '2px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
+            <button style = {{ backgroundColor: 'lightpink', padding: '2px 4px', cursor: 'pointer', border: '2px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
         </div>
     );
 }

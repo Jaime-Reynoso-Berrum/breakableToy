@@ -11,7 +11,18 @@ function ListContainer(props: TodoItemProps){
     const {todos, CompleteItem, onEdit} = props;
 
     return(
-        <div>
+        <div style = {{
+            position: 'fixed',
+            top: '200px',
+            left: '2rem',
+            right: '2rem',
+            bottom: '160px',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 100
+        }}>
+            <h2>My Todo List</h2>
+
             <div
                 style = {{
                     border: '1px solid black',
