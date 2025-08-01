@@ -20,8 +20,6 @@ public class TodoService {
     public Duration lowTimeCompletion = Duration.ZERO;
 
     private List<Todo> originalList = new ArrayList<>();
-    private List<Todo> filteredList = new ArrayList<>();
-    private List<Todo> sortedList = new ArrayList<>();
 
     // region **** Business Methods ****
 
@@ -98,7 +96,7 @@ public class TodoService {
 
     // combined filter method
     public List<Todo> getFilteredTodos(String queryFilter, int priorityFilter, int completedFilter){
-        filteredList = new ArrayList<>(originalList);
+        List<Todo> filteredList = new ArrayList<>();
 
         if (queryFilter != null && !queryFilter.isEmpty()) {
             filteredList = filterByQuery(filteredList, queryFilter);
@@ -117,10 +115,8 @@ public class TodoService {
     }
 
     //sorts todo objects by their due date and priority
-    public List<Todo> sortedTodos(Boolean ascending, Boolean sortByDuedate){
-
-        if (!filteredList.isEmpty()) { sortedList = filteredList;}
-        else { sortedList = originalList;}
+    public List<Todo> sortedTodos(List<Todo> list, Boolean ascending, Boolean sortByDuedate){
+        List<Todo> sortedList = new ArrayList<>(list);
 
         Comparator<Todo> comparator = new Comparator<Todo>() {
             @Override
@@ -155,12 +151,8 @@ public class TodoService {
         return sortedList;
     }
 
-    public List<Todo> paginateTodos(int pageNumber){
-        List<Todo> finalList;
-
-        if (!sortedList.isEmpty()) { finalList = sortedList;}
-        else if (!filteredList.isEmpty()) { finalList = filteredList;}
-        else { finalList = originalList;}
+    public List<Todo> paginateTodos(List<Todo> list, int pageNumber){
+        List<Todo> finalList = new ArrayList<>(list);
 
         int pageSize = 10;
 

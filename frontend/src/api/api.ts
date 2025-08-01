@@ -22,7 +22,7 @@ export async function editTodo(id: string, updated: EditTodoRequest): Promise<To
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
     });
-    if (!response.ok) throw new Error("Failed to add task");
+    if (!response.ok) throw new Error("Failed to edit task");
 
     return await response.json();
 }
@@ -67,7 +67,7 @@ export async function getTodos(
 
     const response = await fetch(`${BASE_URL}?${params}`);
 
-    if (!response.ok) throw new Error("Failed to add task");
+    if (!response.ok) throw new Error("Failed to grab tasks");
 
     return await response.json();
 }

@@ -76,9 +76,9 @@ public class TodoController {
             @RequestParam(defaultValue = "true") boolean ascending,
             @RequestParam(defaultValue = "true") boolean sortByDueDate) {
 
-        todoService.getFilteredTodos(query, priority, completed);
-        todoService.sortedTodos(ascending, sortByDueDate);
-        return todoService.paginateTodos(page);
+        List<Todo> filtered = todoService.getFilteredTodos(query, priority, completed);
+        List<Todo> sorted = todoService.sortedTodos(filtered, ascending, sortByDueDate);
+        return todoService.paginateTodos(sorted, page);
     }
 
 }
