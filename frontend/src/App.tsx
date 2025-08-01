@@ -34,17 +34,7 @@ function App() {
 
   const [metrics, setMetrics] = useState<string[]>([]);
 
-  // useEffect(() => {
-  //     const metricsOnLaunch = async () => {
-  //         try {
-  //             const data = await getMetrics();
-  //             setMetrics(data);
-  //         } catch (error){
-  //             console.log("Failed to grab metrics", error);
-  //         }
-  //     };
-  //     metricsOnLaunch();
-  // }, []);
+  const isLastPage = todos.length < 10;
 
   const handleAdd = async () => {
 
@@ -141,32 +131,56 @@ function App() {
         setCompletedFilter={setCompletedFilter}
         onFilterChange={handleFilterChange}
         />
+
+        {/* button bar */}
+            <div
+                style={{
+                    position:'fixed',
+                    top: '150px',
+                    zIndex: 1050,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 1rem',
+
+                }}>
+                <button style = {{ marginRight: '10rem', border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
+
+                <div style={{display: 'flex', justifyContent: 'flex-end', gap: '0.5rem'}}>
+                    <button onClick={() => setSortByDueDate(prev => !prev)} style = {{ marginRight: '8px', border: '1px solid black'}}>
+                        Sort by: {sortByDueDate ? "Due Date" : "Priority"}
+                    </button>
+                    <button onClick={() => setAscending(prev => !prev)} style = {{ border: '1px solid black'}}>
+                        Order : {ascending  ? "Ascending" : "Descending"}
+                    </button>
+                </div>
+
+            </div>
+
         <div>
-            <button style = {{ border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
-
-            <button onClick={() => setSortByDueDate(prev => !prev)} style = {{ border: '1px solid black'}}>
-                Sort by: {sortByDueDate ? "Due Date" : "Priority"}
-            </button>
-            <button onClick={() => setAscending(prev => !prev)} style = {{ border: '1px solid black'}}>
-                Order : {ascending  ? "Ascending" : "Descending"}
-            </button>
-
-
             <ListContainer
                 todos={todos}
                 CompleteItem={CompleteItem}
                 onEdit={openEditModal}
             />
-            <div style={{ margin: "1rem" }}>
+            <div style={{
+                position: 'fixed',
+                bottom: '120px',
+                left: 0,
+                right: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                margin: '1rem' }}
+            >
                 <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    style = {{ border: '1px solid black'}} disabled={currentPage === 1}
+                    style = {{ marginRight: '5px', border: '1px solid black'}} disabled={currentPage === 1}
                     >
                     Prev Page
                 </button>
                 <span> Page {currentPage} </span>
                 <button
-                    style = {{ border: '1px solid black'}} onClick={() => setCurrentPage(p => p + 1)}>Next Page
+                    disabled={isLastPage} style = {{ marginLeft: '5px', border: '1px solid black'}} onClick={() => setCurrentPage(p => p + 1)}>Next Page
                 </button>
             </div>
 

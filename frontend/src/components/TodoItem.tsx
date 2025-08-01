@@ -31,7 +31,14 @@ function formatDueDate(dueDate: string | null): string {
     });
 }
 
-
+function priorityWordMap(priority: number) {
+    switch(priority){
+        case 1: return "High";
+        case 2: return "Medium";
+        case 3: return "Low";
+        default: break;
+    }
+}
 
 function TodoItem(props : TodoItemProps){
     const { todo, CompleteItem, onEdit } = props;
@@ -53,10 +60,10 @@ function TodoItem(props : TodoItemProps){
                 />
             </div>
             <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.todoItem}</strong></div>
-            <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.priority}</strong></div>
+            <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{priorityWordMap(todo.priority)}</strong></div>
 
-            <div style={{ borderRight: '1px solid black', padding: '8px'}} title = {formatDueDate(todo.dueDate)}><strong>{todo.dueDate ? todo.dueDate : "No due date"}</strong></div>
-            <button style = {{ cursor: 'pointer', borderRight: '1px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
+            <div style={{ borderRight: '1px solid black', padding: '8px'}} title = {formatDueDate(todo.dueDate)}><strong>{formatDueDate(todo.dueDate)}</strong></div>
+            <button style = {{ padding: '2px 4px', cursor: 'pointer', border: '2px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
         </div>
     );
 }

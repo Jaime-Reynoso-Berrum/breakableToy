@@ -96,10 +96,10 @@ function AddTodoModal({
                         style = {{ width: '100%', marginBottom: '16px' }}
                     />
                     <div style = {{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button onClick = {onClose} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                        <button onClick = {onClose} style = {{ border: '1px solid black', cursor: 'pointer', padding: '8px 16px' }}>
                             Cancel
                         </button>
-                        <button onClick = {handleAddClick} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                        <button onClick = {handleAddClick} style = {{ border: '1px solid black', cursor: 'pointer', padding: '8px 16px' }}>
                             Add Todo Item
                         </button>
                     </div>

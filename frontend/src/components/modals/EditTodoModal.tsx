@@ -105,13 +105,13 @@ function EditTodoModal({
                             />
                         </label>
                             <div style = {{ display: 'flex', justifyContent: 'space-between', gap: '8px'}}>
-                                <button onClick = {handleSave} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                                <button onClick = {handleSave} style = {{ border: '1px solid black', cursor: 'pointer', padding: '8px 16px' }}>
                                     Save Changes
                                 </button>
-                                <button onClick = {onClose} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                                <button onClick = {onClose} style = {{ border: '1px solid black', cursor: 'pointer', padding: '8px 16px' }}>
                                     Cancel
                                 </button>
-                                <button onClick = {handleDeleteClick} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                                <button onClick = {handleDeleteClick} style = {{ border: '1px solid black', cursor: 'pointer', padding: '8px 16px' }}>
                                     DELETE ITEM
                                 </button>
                             </div>
