@@ -106,8 +106,15 @@ public class TodoService {
     }
 
     public List<Todo> setQueryFilter(String queryFilter){
+        System.out.println("Query: " + queryFilter);
+        System.out.println("list size: " + originalList.size());
+
+
         currentQueryFilter = queryFilter;
         updateList();
+
+        System.out.println("final list size: " + finalList.size());
+
         return finalList;
     }
 
@@ -122,6 +129,24 @@ public class TodoService {
         currentCompleted = completedFilter;
         updateList();
         return finalList;
+    }
+
+    // combined filter method
+    public List<Todo> getFilteredTodos(String queryFilter, int priorityFilter, int completedFilter){
+        List<Todo> result = new ArrayList<>(originalList);
+
+        if (queryFilter != null && !queryFilter.isEmpty()) {
+            result = filterByQuery(result, queryFilter);
+        }
+
+        if (priorityFilter != 0) {
+            result = filterByPriority(result, priorityFilter);
+        }
+
+        if (completedFilter != 0) {
+            result = filterByComplete(result, completedFilter);
+        }
+        return result;
     }
 
     public List<Todo> sortFinalList(boolean ascending, boolean descending){
@@ -155,7 +180,7 @@ public class TodoService {
 
     // filters todo list by query
     private List<Todo> filterByQuery(List<Todo> list, String query){
-        if(query == null && query.isEmpty()) return list;
+        if(query == null || query.isEmpty()) return list;
 
         List<Todo> queryList = new ArrayList<>();
 

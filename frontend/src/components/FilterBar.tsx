@@ -22,14 +22,16 @@ function FilterBar ({
         const value = Number(event.target.value);
         if (value == 0 || value == 1 || value == 2) {
             setCompletedFilter(value);
-            onFilterChange();
         }
     }
 
     const handlePrioriytChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setPriorityFilter(Number(event.target.value));
-        onFilterChange();
     };
+
+    const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setQueryFilter(event.target.value);
+    }
 
     const handleQuerySearch = () => {
         onFilterChange()
@@ -37,7 +39,7 @@ function FilterBar ({
 
     return (
         <div style = {{
-            display: 'felx',
+            display: 'flex',
             gap: '1rem',
             padding: '1rem',
             alignItems: 'center',
@@ -48,7 +50,7 @@ function FilterBar ({
                 type = 'text'
                 placeholder = 'Search for items here'
                 value = {queryFilter}
-                onChange={(event) => setQueryFilter(event.target.value)}
+                onChange={handleQueryChange}
             />
 
             <select value = {priorityFilter} onChange = {handlePrioriytChange}>

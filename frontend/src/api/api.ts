@@ -50,7 +50,7 @@ export async function getMetrics(): Promise<string[]> {
 
 export async function filterByQuery(queryFilter: string): Promise<Todo[]> {
     const encodedQuery = encodeURIComponent(queryFilter);
-    const response = await fetch(`${BASE_URL}/filter/queryFilter?queryFilter=${encodedQuery}`, {
+    const response = await fetch(`${BASE_URL}/filter/query?queryFilter=${encodedQuery}`, {
         headers: { "Content-Type": "application/json" },
     });
     if (!response.ok) throw new Error("Failed to filter todos by query");
@@ -66,9 +66,29 @@ export async function filterByPriority(priorityFilter: number): Promise<Todo[]> 
 }
 
 export async function filterByCompleted(completedFilter: 0 | 1 | 2): Promise<Todo[]> {
-    const response = await fetch(`${BASE_URL}/filter/completed?completedFilter${completedFilter}`);
+    const response = await fetch(`${BASE_URL}/filter/completed?completedFilter=${completedFilter}`);
     if (!response.ok) throw new Error("Failed to filter by completed");
 
+    return await response.json();
+}
+
+export async function getCombinedFilters(queryFilter: string, priorityFilter: number, completedFilter: 0| 1 | 2): Promise<Todo[]> {
+    const params = new URLSearchParams();
+
+    if (queryFilter.trim() !== "") {
+        params.append('queryFilter', queryFilter);
+    }
+    if (priorityFilter !== 0) {
+        params.append('priorityFilter', priorityFilter.toString());
+    }
+    if(completedFilter !== 0){
+        params.append('completedFiler', completedFilter.toString());
+    }
+
+    const response = await fetch(`${BASE_URL}/filter/combined?${params}`, {
+        headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) throw new Error("Failed to filter");
     return await response.json();
 }
 

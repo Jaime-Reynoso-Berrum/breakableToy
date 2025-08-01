@@ -83,6 +83,13 @@ public class TodoController {
         return todoService.setCompletedFilter(completedFilter);
     }
 
+    @GetMapping("/filter/combined")
+    public List<Todo> getCombinedFilters(@RequestParam(required = false, defaultValue = "") String queryFilter,
+                                        @RequestParam(defaultValue = "0") int priorityFilter,
+                                        @RequestParam(defaultValue = "0") int completedFilter) {
+        return todoService.getFilteredTodos(queryFilter, priorityFilter, completedFilter);
+    }
+
     @GetMapping("/sort")
     public List<Todo> sortFinalList(@RequestParam(defaultValue = "true") boolean ascending,
                                      @RequestParam(defaultValue = "true") boolean sortByDueDate) {

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import './App.css'
 import AddTodoModal from "./components/modals/AddTodoModal.tsx";
 import EditTodoModal from "./components/modals/EditTodoModal.tsx"
@@ -8,10 +8,9 @@ import ListContainer from "./components/ListContainer.tsx";
 import {
     addTodo,
     completeTodo,
-    editTodo, filterByCompleted,
-    filterByPriority,
-    filterByQuery,
-    getMetrics, getOriginalList,
+    editTodo,
+    getCombinedFilters,
+    getMetrics,
     undoCompleteTodo
 } from "./api/api.ts";
 import type {Todo} from "./types/AddTodoRequest.tsx";
@@ -111,26 +110,20 @@ function App() {
       }
   }
 
-  const handleFilterChange = async () => {
+  const handleFilterChange = useCallback(async () => {
       try {
-          let filtered: Todo[] = [];
-
-          if (queryFilter.trim() !== "") {
-              filtered = await filterByQuery(queryFilter);
-          } else if (priorityFilter !== 0) {
-              filtered = await filterByPriority(priorityFilter);
-          } else if (completedFilter !== 0) {
-              filtered = await filterByCompleted(completedFilter);
-          } else {
-              filtered = await getOriginalList();
-          }
+          const filtered = await getCombinedFilters(queryFilter, priorityFilter, completedFilter);
 
           setTodos(filtered);
       } catch (e) {
           console.log("Filter failed", e);
       }
+  }, [queryFilter, priorityFilter, completedFilter]);
 
-  }
+    useEffect(() => {
+            handleFilterChange();
+        }, [handleFilterChange]
+    );
 
   return (
     <>
