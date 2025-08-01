@@ -26,7 +26,6 @@ public class TodoService {
 
     private List<Todo> originalList = new ArrayList<>();
     private List<Todo> filteredList = new ArrayList<>();
-    private List<Todo> finalList = new ArrayList<>();
 
     // region **** Business Methods ****
 
@@ -36,7 +35,6 @@ public class TodoService {
         todoItems.put(newItem.getId(), newItem);
         originalList.add(newItem);
 
-        updateList();
         return newItem;
     }
 
@@ -48,7 +46,6 @@ public class TodoService {
         if(delete){
             originalList.remove(currentItem);
             todoItems.remove(id);
-            updateList();
             return null;
         }
 
@@ -56,7 +53,6 @@ public class TodoService {
         if(priority != currentItem.getPriority()){ currentItem.setPriority(priority);}
         if(dueDate != currentItem.getDueDate()){ currentItem.setDueDate(dueDate);}
 
-        updateList();
         return currentItem;
     }
 
@@ -68,9 +64,9 @@ public class TodoService {
         // calculates total duration time and adds it to metrics
         currentItem.setDoneDate(LocalDateTime.now());
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
+
         addTimeToMetrics(currentItem.getPriority(), todoDuration);
 
-        updateList();
         return currentItem;
     }
 
@@ -84,7 +80,6 @@ public class TodoService {
         removeTimeFromMetrics(currentItem.getPriority(), todoDuration);
         currentItem.setDoneDate(null);
 
-        updateList();
         return currentItem;
     }
 
@@ -105,32 +100,6 @@ public class TodoService {
         return new String[]{avgTotalTime, avgHighTime, avgMediumTime, avgLowTime};
     }
 
-    public List<Todo> setQueryFilter(String queryFilter){
-        System.out.println("Query: " + queryFilter);
-        System.out.println("list size: " + originalList.size());
-
-
-        currentQueryFilter = queryFilter;
-        updateList();
-
-        System.out.println("final list size: " + finalList.size());
-
-        return finalList;
-    }
-
-    public List<Todo> setPriorityFilter(int priorityFilter){
-        currentPriorityFilter = priorityFilter;
-        updateList();
-        return finalList;
-    }
-
-    // 0 = all, 1 = completd, 2 = not completed
-    public List<Todo> setCompletedFilter(int completedFilter){
-        currentCompleted = completedFilter;
-        updateList();
-        return finalList;
-    }
-
     // combined filter method
     public List<Todo> getFilteredTodos(String queryFilter, int priorityFilter, int completedFilter){
         List<Todo> result = new ArrayList<>(originalList);
@@ -146,37 +115,54 @@ public class TodoService {
         if (completedFilter != 0) {
             result = filterByComplete(result, completedFilter);
         }
+
+        filteredList = result;
         return result;
     }
 
-    public List<Todo> sortFinalList(boolean ascending, boolean descending){
-        this.currentAscending = ascending;
-        this.currentSortByDueDate = descending;
-        updateList();
-        return finalList;
+    //sorts todo objects by their due date and priority
+    public List<Todo> sortedTodos(Boolean ascending, Boolean sortByDuedate){
+
+        List<Todo> sortedList;
+        if (filteredList.isEmpty()) { sortedList = originalList;}
+        else { sortedList = filteredList;}
+
+        Comparator<Todo> comparator = new Comparator<Todo>() {
+            @Override
+            public int compare(Todo item1, Todo item2) {
+                int result;
+
+                if (ascending == null && sortByDuedate == null) { return 0; }
+
+                // sorts by due date first, and then by priority
+                if (sortByDuedate) {
+
+                    result = sortByDueDate(item1, item2);
+                    if (result == 0) {
+                        result = sortByPriority(item1, item2);
+                    }
+                } else {
+                    // sorts by priority first, then by due date
+                    result = sortByPriority(item1, item2);
+                    if (result == 0) {
+                        result = sortByDueDate(item1, item2);
+                    }
+                }
+
+                if (ascending) { return result; }
+                else{
+                    return -result;
+                }
+            }
+        };
+
+        Collections.sort(sortedList, comparator);
+        return sortedList;
     }
 
     // endregion *******
 
     // region **** Helper Methods ****
-
-    private void updateList(){
-        finalList = rebuildFinalList();
-    }
-
-    private List<Todo> rebuildFinalList(){
-        List<Todo> result = new ArrayList<>(originalList);
-        result = filterByQuery(result, currentQueryFilter);
-        result = filterByPriority(result, currentPriorityFilter);
-        result = filterByComplete(result, currentCompleted);
-        result = sortedTodos(result, currentAscending, currentSortByDueDate);
-        return result;
-    }
-
-    // grabs the current filtered and sorted list
-    private List<Todo> getFinalList(){
-        return new ArrayList<>(finalList);
-    }
 
     // filters todo list by query
     private List<Todo> filterByQuery(List<Todo> list, String query){
@@ -223,42 +209,6 @@ public class TodoService {
         return completedList;
     }
 
-    //sorts todo objects by their due date and priority
-    private List<Todo> sortedTodos(List<Todo> filteredList, Boolean ascending, Boolean sortByDuedate){
-        List<Todo> sortedList = new ArrayList<>(filteredList);
-
-        Comparator<Todo> comparator = new Comparator<Todo>() {
-            @Override
-            public int compare(Todo item1, Todo item2) {
-                int result;
-
-                if (ascending == null && sortByDuedate == null) { return 0; }
-
-                // sorts by due date first, and then by priority
-                if (sortByDuedate) {
-
-                    result = sortByDueDate(item1, item2);
-                    if (result == 0) {
-                        result = sortByPriority(item1, item2);
-                    }
-                } else {
-                    // sorts by priority first, then by due date
-                    result = sortByPriority(item1, item2);
-                    if (result == 0) {
-                        result = sortByDueDate(item1, item2);
-                    }
-                }
-
-                if (ascending) { return result; }
-                else{
-                    return -result;
-                }
-            }
-        };
-
-        Collections.sort(sortedList, comparator);
-        return sortedList;
-    }
 
     // compares due dates of two items to sort them
     private int sortByDueDate(Todo item1, Todo item2){

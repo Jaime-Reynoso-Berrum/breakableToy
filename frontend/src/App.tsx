@@ -120,10 +120,10 @@ function App() {
       }
   }, [queryFilter, priorityFilter, completedFilter]);
 
-    useEffect(() => {
+  useEffect(() => {
             handleFilterChange();
         }, [handleFilterChange]
-    );
+  );
 
   return (
     <>

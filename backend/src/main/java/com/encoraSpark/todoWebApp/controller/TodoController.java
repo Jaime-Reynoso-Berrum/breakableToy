@@ -68,32 +68,17 @@ public class TodoController {
         return todoService.getAvgCompletionTime();
     }
 
-    @GetMapping("/filter/query")
-    public List<Todo> getQueryFilter(@RequestParam String queryFilter) {
-            return todoService.setQueryFilter(queryFilter);
-    }
-
-    @GetMapping("/filter/priority")
-    public List<Todo> getPriorityFilter(@RequestParam int priorityFilter) {
-        return todoService.setPriorityFilter(priorityFilter);
-    }
-
-    @GetMapping("/filter/completed")
-    public List<Todo> getCompletedFilter(@RequestParam int completedFilter) {
-        return todoService.setCompletedFilter(completedFilter);
-    }
-
     @GetMapping("/filter/combined")
     public List<Todo> getCombinedFilters(@RequestParam(required = false, defaultValue = "") String queryFilter,
-                                        @RequestParam(defaultValue = "0") int priorityFilter,
-                                        @RequestParam(defaultValue = "0") int completedFilter) {
+                                         @RequestParam(defaultValue = "0") int priorityFilter,
+                                         @RequestParam(defaultValue = "0") int completedFilter) {
         return todoService.getFilteredTodos(queryFilter, priorityFilter, completedFilter);
     }
 
     @GetMapping("/sort")
-    public List<Todo> sortFinalList(@RequestParam(defaultValue = "true") boolean ascending,
+    public List<Todo> sortSortedList(@RequestParam(defaultValue = "true") boolean ascending,
                                      @RequestParam(defaultValue = "true") boolean sortByDueDate) {
-        return todoService.sortFinalList(ascending, sortByDueDate);
+        return todoService.sortSortedList(ascending, sortByDueDate);
     }
 
     @GetMapping
