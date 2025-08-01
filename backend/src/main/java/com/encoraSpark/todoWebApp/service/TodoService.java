@@ -96,7 +96,7 @@ public class TodoService {
 
     // combined filter method
     public List<Todo> getFilteredTodos(String queryFilter, int priorityFilter, int completedFilter){
-        List<Todo> filteredList = new ArrayList<>();
+        List<Todo> filteredList = new ArrayList<>(originalList);
 
         if (queryFilter != null && !queryFilter.isEmpty()) {
             filteredList = filterByQuery(filteredList, queryFilter);
@@ -159,8 +159,8 @@ public class TodoService {
         int startPage = (pageNumber - 1) * pageSize;
         int endPage = startPage + pageSize;
 
-        if (endPage > originalList.size()) {
-            endPage = originalList.size();
+        if (endPage > finalList.size()) {
+            endPage = finalList.size();
         }
         return finalList.subList(startPage, endPage);
     }

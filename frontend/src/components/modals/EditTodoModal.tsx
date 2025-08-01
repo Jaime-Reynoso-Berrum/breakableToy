@@ -37,6 +37,10 @@ function EditTodoModal({
         onClose();
     }
 
+    const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setPriority(parseInt(e.target.value));
+    }
+
     return (
         <div style = {{
             position: 'fixed',
@@ -73,14 +77,11 @@ function EditTodoModal({
                 </label>
                 <label>
                     Priority:<br />
-                    <input
-                        type = "number"
-                        min={1}
-                        max={3}
-                        value = {priority}
-                        onChange = {e => setPriority(parseInt(e.target.value))}
-                        style = {{ width: '100%', marginBottom: '12px' }}
-                    />
+                    <select value = {priority} onChange = {handlePriorityChange} style = {{ width: '100%', marginBottom: '16px' }}>
+                        <option value = {1}>High Priority</option>
+                        <option value = {2}>Medium Priority</option>
+                        <option value = {3}>Low Priority</option>
+                    </select>
                 </label>
                 <label>
                     Due date (optional):<br />

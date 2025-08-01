@@ -6,11 +6,32 @@ type TodoItemProps = {
     onEdit: (todo: Todo) => void;
 };
 
+function getBackgroundColor(dueDate: string| null): string {
+    if (!dueDate) return 'transparent';
+
+    const now = new Date();
+    const due = new Date(dueDate);
+    const msPerDay = 24* 60 * 60 * 1000;
+    const difference = Math.ceil((due.getTime() - now.getTime()) / msPerDay);
+
+    if (difference < 7) return 'red';
+    if (difference < 14) return 'yellow';
+    return 'green';
+}
+
+
+
 function TodoItem(props : TodoItemProps){
     const { todo, CompleteItem, onEdit } = props;
 
     return(
-        <div style = {{ display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid black'}}>
+        <div style = {{ backgroundColor: getBackgroundColor(todo.dueDate),
+                        textDecoration: todo.completed ? 'line-through' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        color: 'black',
+                        border: '1px solid black'}}>
             <input
                 type = 'checkbox'
                 checked = {todo.completed}
