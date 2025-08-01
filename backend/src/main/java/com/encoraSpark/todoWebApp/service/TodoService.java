@@ -274,7 +274,7 @@ public class TodoService {
 
     // returns a string representation of avg completion time
     private String calculateMetrics(Duration todoDuration, int todoCount){
-        if (todoCount == 0) return "Complete a To Do item to find the average";
+        if (todoCount == 0) return "N/A";
 
         Duration average = todoDuration.dividedBy(todoCount);
         long days = average.toDays();

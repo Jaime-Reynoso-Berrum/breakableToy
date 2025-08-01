@@ -19,6 +19,18 @@ function getBackgroundColor(dueDate: string| null): string {
     return 'green';
 }
 
+function formatDueDate(dueDate: string | null): string {
+    if (!dueDate) return "No due date";
+    const date = new Date(dueDate);
+    return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+    });
+}
+
 
 
 function TodoItem(props : TodoItemProps){
@@ -30,19 +42,21 @@ function TodoItem(props : TodoItemProps){
                         display: 'grid',
                         gridTemplateColumns: '1fr 4fr 2fr 3fr 2fr',
                         alignItems: 'center',
-                        gap: '10px',
                         color: 'black',
                         borderBottom: '1px solid black'}}>
-            <input
-                style={{ borderRight: '1px solid black', padding: '8px', alignItems: 'center'}}
-                type = 'checkbox'
-                checked = {todo.completed}
-                onChange = {() => CompleteItem(todo.id)}
-            />
+            <div style={{ borderRight: '1px solid black', borderLeft: '1px solid black', padding: '8px', alignItems: 'center', justifyContent: 'center'}}>
+                <input
+                    style = {{ border: '3px solid black'}}
+                    type = 'checkbox'
+                    checked = {todo.completed}
+                    onChange = {() => CompleteItem(todo.id)}
+                />
+            </div>
             <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.todoItem}</strong></div>
             <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.priority}</strong></div>
-            <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.dueDate ? todo.dueDate : "No due date"}</strong></div>
-            <button style = {{ cursor: 'pointer', border: '1px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
+
+            <div style={{ borderRight: '1px solid black', padding: '8px'}} title = {formatDueDate(todo.dueDate)}><strong>{todo.dueDate ? todo.dueDate : "No due date"}</strong></div>
+            <button style = {{ cursor: 'pointer', borderRight: '1px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
         </div>
     );
 }

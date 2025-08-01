@@ -87,7 +87,6 @@ function App() {
 
       setEditModalOpen(false);
       setEditingTodo(null);
-      handleFilterChange();
 
 
   }

@@ -39,6 +39,7 @@ function EditTodoModal({
 
     const handleConfirmDelete =() => {
         onEdit(id, todoItem, priority, dueDate, true);
+        setShowConfirmDelete(false);
         onClose();
     }
 
@@ -74,45 +75,64 @@ function EditTodoModal({
                     width: '320px',
                 }}
             >
-                <h2 style = {{ marginBottom: '12px' }}>Edit Todo Item</h2>
-                <label>
-                    Todo Item:<br />
-                    <input
-                        type = "text"
-                        value = {todoItem}
-                        onChange = {e => setTodoItem(e.target.value)}
-                        style = {{ width: '100%', marginBottom: '12px' }}
-                    />
-                </label>
-                <label>
-                    Priority:<br />
-                    <select value = {priority} onChange = {handlePriorityChange} style = {{ width: '100%', marginBottom: '16px' }}>
-                        <option value = {1}>High Priority</option>
-                        <option value = {2}>Medium Priority</option>
-                        <option value = {3}>Low Priority</option>
-                    </select>
-                </label>
-                <label>
-                    Due date (optional):<br />
-                    <input
-                        type = "dateTime-local"
-                        value = {dueDate ?? ''}
-                        onChange = {e => setDueDate(e.target.value || '')}
-                        style = {{ width: '100%', marginBottom: '16px' }}
-                    />
-                    <div style = {{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button onClick = {handleSave} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
-                            Save Changes
-                        </button>
-                        <button onClick = {onClose} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
-                            Cancel
-                        </button>
-                        <button onClick = {handleDeleteClick} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
-                            DELETE ITEM
-                        </button>
-
-                    </div>
-                </label>
+                {!showConfirmDelete ? (
+                    <>
+                        <h2 style = {{ marginBottom: '12px' }}>Edit Todo Item</h2>
+                        <label>
+                            Todo Item:<br />
+                            <input
+                                type = "text"
+                                value = {todoItem}
+                                onChange = {e => setTodoItem(e.target.value)}
+                                style = {{ width: '100%', marginBottom: '12px' }}
+                            />
+                        </label>
+                        <label>
+                            Priority:<br />
+                            <select value = {priority} onChange = {handlePriorityChange} style = {{ width: '100%', marginBottom: '16px' }}>
+                                <option value = {1}>High Priority</option>
+                                <option value = {2}>Medium Priority</option>
+                                <option value = {3}>Low Priority</option>
+                            </select>
+                        </label>
+                        <label>
+                            Due date (optional):<br />
+                            <input
+                                type = "datetime-local"
+                                value = {dueDate ?? ''}
+                                onChange = {e => setDueDate(e.target.value || '')}
+                                style = {{ width: '100%', marginBottom: '16px' }}
+                            />
+                        </label>
+                            <div style = {{ display: 'flex', justifyContent: 'space-between', gap: '8px'}}>
+                                <button onClick = {handleSave} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                                    Save Changes
+                                </button>
+                                <button onClick = {onClose} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                                    Cancel
+                                </button>
+                                <button onClick = {handleDeleteClick} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
+                                    DELETE ITEM
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <h2 style ={{ marginBottom: '16px', color: 'red' }}>Confirm Delete</h2>
+                            <p style={{ marginBottom: '20px'}}>
+                                Are you sure you want to delete this item?<br/>
+                                This action can NOT be undoe
+                            </p>
+                            <div style = {{ display: 'flex', justifyContent: 'space-between', gap: '8px'}}>
+                                <button onClick = {handleCancelDelete} style={{ cursor: 'poiunter', padding: '8px 16px', backgroundColor: "gray"}}>
+                                    Cancel
+                                </button>
+                                <button onClick = {handleConfirmDelete} style={{ cursor: 'poiunter', padding: '8px 16px', backgroundColor: "gray"}}>
+                                    Delete
+                                </button>
+                            </div>
+                        </>
+                    )}
             </div>
         </div>
     );
