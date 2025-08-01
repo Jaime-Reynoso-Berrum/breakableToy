@@ -1,3 +1,4 @@
+import {useState} from "react";
 
 type AddModalProps = {
     todoItem: string;
@@ -20,9 +21,24 @@ function AddTodoModal({
     onClose,
     onSubmit,
     }: AddModalProps){
-        const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             setPriority(parseInt(e.target.value));
     };
+
+    const handleAddClick = () => {
+        if (todoItem.trim() === ""){
+            setErrorMessage("Please include a description for your todo item");
+            return;
+        }
+        if (todoItem.length > 120) {
+            setErrorMessage("Todo description must be less tha 120 characters");
+            return;
+        }
+        setErrorMessage("");
+        onSubmit()
+    }
 
     return (
         <div style = {{
@@ -59,6 +75,9 @@ function AddTodoModal({
                         style = {{ width: '100%', marginBottom: '12px' }}
                     />
                 </label>
+                {errorMessage && (
+                    <p style={{ color: 'red', marginBottom: '12px'}}>{errorMessage}</p>
+                )}
                 <label>
                     Priority:<br />
 
@@ -71,16 +90,16 @@ function AddTodoModal({
                 <label>
                     Due date (optional):<br />
                     <input
-                        type = "dateTime-local"
+                        type = "datetime-local"
                         value = {dueDate ?? ''}
                         onChange = {e => setDueDate(e.target.value || null)}
                         style = {{ width: '100%', marginBottom: '16px' }}
                     />
                     <div style = {{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button onClick = {onClose} style = {{ padding: '8px 16px' }}>
+                        <button onClick = {onClose} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
                             Cancel
                         </button>
-                        <button onClick = {onSubmit} style = {{ padding: '8px 16px' }}>
+                        <button onClick = {handleAddClick} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
                             Add Todo Item
                         </button>
                     </div>

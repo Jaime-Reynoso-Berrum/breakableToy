@@ -152,17 +152,24 @@ public class TodoService {
     }
 
     public List<Todo> paginateTodos(List<Todo> list, int pageNumber){
-        List<Todo> finalList = new ArrayList<>(list);
+        if (list == null || list.isEmpty()) { return new ArrayList<>(); }
 
+        if (pageNumber < 1){ pageNumber = 1; }
         int pageSize = 10;
 
-        int startPage = (pageNumber - 1) * pageSize;
-        int endPage = startPage + pageSize;
+        int startIndex = (pageNumber - 1) * pageSize;
 
-        if (endPage > finalList.size()) {
-            endPage = finalList.size();
+        if (startIndex > list.size()){
+            return new ArrayList<>();
         }
-        return finalList.subList(startPage, endPage);
+
+        int endIndex = Math.min(startIndex + pageSize, list.size());
+
+        try {
+            return new ArrayList<>(list.subList(startIndex, endIndex));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // endregion *******

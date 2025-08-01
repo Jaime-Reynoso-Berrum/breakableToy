@@ -87,8 +87,10 @@ function App() {
 
       setEditModalOpen(false);
       setEditingTodo(null);
+      handleFilterChange();
 
-    }
+
+  }
 
     const CompleteItem = async (id: string) => {
       const todo  = todos.find(todo => todo.id === id);
@@ -107,6 +109,8 @@ function App() {
 
           setTodos(prev => prev.map(todo => (todo.id === id ? updatedTodo : todo))
           );
+          handleFilterChange();
+
       } catch (error){
           console.error("Failed to toggle complete", error);
       }
@@ -141,6 +145,13 @@ function App() {
         <div>
             <button style = {{ border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
 
+            <button onClick={() => setSortByDueDate(prev => !prev)} style = {{ border: '1px solid black'}}>
+                Sort by: {sortByDueDate ? "Due Date" : "Priority"}
+            </button>
+            <button onClick={() => setAscending(prev => !prev)} style = {{ border: '1px solid black'}}>
+                Order : {ascending  ? "Ascending" : "Descending"}
+            </button>
+
 
             <ListContainer
                 todos={todos}
@@ -148,21 +159,15 @@ function App() {
                 onEdit={openEditModal}
             />
             <div style={{ margin: "1rem" }}>
-                <button onClick={() => setSortByDueDate(prev => !prev)}>
-                    Sort by: {sortByDueDate ? "Due Date" : "Priority"}
-                </button>
-                <button onClick={() => setAscending(prev => !prev)}>
-                    Order : {ascending  ? "Ascending" : "Descending"}
-                </button>
                 <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
+                    style = {{ border: '1px solid black'}} disabled={currentPage === 1}
                     >
                     Prev Page
                 </button>
                 <span> Page {currentPage} </span>
                 <button
-                    onClick={() => setCurrentPage(p => p + 1)}>Next Page
+                    style = {{ border: '1px solid black'}} onClick={() => setCurrentPage(p => p + 1)}>Next Page
                 </button>
             </div>
 

@@ -26,15 +26,24 @@ function EditTodoModal({
     const [todoItem, setTodoItem] = useState(currentItem);
     const [priority, setPriority] = useState(currentPriority);
     const [dueDate, setDueDate] = useState(currentDueDate);
+    const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
     const handleSave = () => {
         onEdit(id, todoItem, priority, dueDate, false);
         onClose();
     }
 
-    const handleDelete = () => {
+    const handleDeleteClick = () => {
+        setShowConfirmDelete(true);
+    }
+
+    const handleConfirmDelete =() => {
         onEdit(id, todoItem, priority, dueDate, true);
         onClose();
+    }
+
+    const handleCancelDelete = () => {
+        setShowConfirmDelete(false);
     }
 
     const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -92,13 +101,13 @@ function EditTodoModal({
                         style = {{ width: '100%', marginBottom: '16px' }}
                     />
                     <div style = {{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button onClick = {handleSave} style = {{ padding: '8px 16px' }}>
+                        <button onClick = {handleSave} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
                             Save Changes
                         </button>
-                        <button onClick = {onClose} style = {{ padding: '8px 16px' }}>
+                        <button onClick = {onClose} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
                             Cancel
                         </button>
-                        <button onClick = {handleDelete} style = {{ padding: '8px 16px' }}>
+                        <button onClick = {handleDeleteClick} style = {{ cursor: 'pointer', padding: '8px 16px' }}>
                             DELETE ITEM
                         </button>
 

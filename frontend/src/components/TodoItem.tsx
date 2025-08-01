@@ -7,7 +7,7 @@ type TodoItemProps = {
 };
 
 function getBackgroundColor(dueDate: string| null): string {
-    if (!dueDate) return 'transparent';
+    if (!dueDate) return 'gray';
 
     const now = new Date();
     const due = new Date(dueDate);
@@ -27,20 +27,22 @@ function TodoItem(props : TodoItemProps){
     return(
         <div style = {{ backgroundColor: getBackgroundColor(todo.dueDate),
                         textDecoration: todo.completed ? 'line-through' : 'none',
-                        display: 'flex',
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 4fr 2fr 3fr 2fr',
                         alignItems: 'center',
                         gap: '10px',
                         color: 'black',
-                        border: '1px solid black'}}>
+                        borderBottom: '1px solid black'}}>
             <input
+                style={{ borderRight: '1px solid black', padding: '8px', alignItems: 'center'}}
                 type = 'checkbox'
                 checked = {todo.completed}
                 onChange = {() => CompleteItem(todo.id)}
             />
-            <p><strong>{todo.todoItem}</strong></p>
-            <p><strong>{todo.priority}</strong></p>
-            <p><strong>{todo.dueDate ? todo.dueDate : "No due date"}</strong></p>
-            <button style = {{border: '1px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
+            <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.todoItem}</strong></div>
+            <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.priority}</strong></div>
+            <div style={{ borderRight: '1px solid black', padding: '8px'}}><strong>{todo.dueDate ? todo.dueDate : "No due date"}</strong></div>
+            <button style = {{ cursor: 'pointer', border: '1px solid black'}} onClick = {() => onEdit(todo)}> Edit/Delete</button>
         </div>
     );
 }

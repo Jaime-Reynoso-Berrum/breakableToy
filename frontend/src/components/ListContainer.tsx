@@ -11,7 +11,23 @@ function ListContainer(props: TodoItemProps){
     const {todos, CompleteItem, onEdit} = props;
 
     return(
-        <div style = {{border: '1px solid black'}}>
+        <div>
+            <div
+                style = {{
+                    border: '1px solid black',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 4fr 2fr 3fr 2fr',
+                    fontWeight: 'bold',
+                    backgroundColor: 'lightgray',
+                    }}
+                >
+                <div style={{ border: '1px solid black', padding: '8px'}}>Done</div>
+                <div style={{ border: '1px solid black', padding: '8px'}}>Task</div>
+                <div style={{ border: '1px solid black', padding: '8px'}}>Priority</div>
+                <div style={{ border: '1px solid black', padding: '8px'}}>Due Date</div>
+                <div style={{ border: '1px solid black', padding: '8px'}}>Edit/Delete</div>
+            </div>
+
             {todos.map((todo) => (
                 <TodoItem
                     key= {todo.id}
