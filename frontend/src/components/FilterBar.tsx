@@ -39,12 +39,19 @@ function FilterBar ({
 
     return (
         <div style = {{
+            position: 'sticky',
+            top: 0,
+            zIndex: 1000,
+            left: 0,
+            right: 0,
             display: 'flex',
+            flexDirection: 'column',
             gap: '1rem',
             padding: '1rem',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             backgroundColor: 'grey',
             border: '1px solid black'
+
         }}>
             <input
                 type = 'text'

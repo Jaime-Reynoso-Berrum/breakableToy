@@ -3,14 +3,39 @@ type MetricsFooterProps = {
     metrics: string[];
 };
 
-function MetricsFooter(props: MetricsFooterProps){
-    const [totalAvg, highAvg, mediumAvg, lowAvg] = props.metrics;
+function MetricsFooter({ metrics }: MetricsFooterProps){
+
+    const totalAvg = metrics[0] || "N/A";
+    const highAvg = metrics[1] || "N/A";
+    const mediumAvg = metrics[2] || "N/A";
+    const lowAvg = metrics[3] || "N/A";
+
     return (
-        <footer style = {{border: '1px solid black'}}>
-            <p>Average Total Completion Time: {totalAvg}</p>
-            <p>Average High Completion Time: {highAvg}</p>
-            <p>Average Medium Completion Time: {mediumAvg}</p>
-            <p>Average Low Completion Time: {lowAvg}</p>
+        <footer
+            style = {{
+                position:'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                borderTop: '1px solid black',
+                gap: '2rem',
+                padding: '1rem',
+                zIndex: 1000,
+                display: 'flex',
+                justifyContent: 'center',
+                background: 'lightgray'
+            }}
+        >
+            <div style={{ flex: 1, padding: '0 20px'}}>
+                <strong> Average time to finish tasks:</strong>
+                <div>{totalAvg}</div>
+            </div>
+            <div style={{ flex: 1, padding: '0 20px'}}>
+                <strong>Average time to finish tasks by priority:</strong>
+                <div>High: {highAvg}</div>
+                <div>Medium: {mediumAvg}</div>
+                <div>Low: {lowAvg}</div>
+            </div>
 
         </footer>
     );
