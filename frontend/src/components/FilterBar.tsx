@@ -39,11 +39,11 @@ function FilterBar ({
 
     return (
         <div style = {{
-            position: 'sticky',
+            position: 'fixed',
             top: 0,
-            zIndex: 1000,
             left: 0,
             right: 0,
+            zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
@@ -53,27 +53,49 @@ function FilterBar ({
             border: '1px solid black'
 
         }}>
-            <input
-                type = 'text'
-                placeholder = 'Search for items here'
-                value = {queryFilter}
-                onChange={handleQueryChange}
-            />
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.75rem',
+                maxWidth: '600px',
+                margin: '0 auto'
+            }}>
+                <div style={{display: 'flex', gap: '0.5rem'}}>
+                    <input
+                        type = 'text'
+                        placeholder = 'Search for items here'
+                        value = {queryFilter}
+                        onChange={handleQueryChange}
+                        style={{flex: 1, minWidth: '400px'}}
+                    />
+                    <button style = {{ border: '1px solid black', marginLeft: 10}} onClick = {handleQuerySearch}>Search</button>
+               </div>
 
-            <select value = {priorityFilter} onChange = {handlePrioriytChange}>
-                <option value = {0}>All Priorities</option>
-                <option value = {1}>High Priority</option>
-                <option value = {2}>Medium Priority</option>
-                <option value = {3}>Low Priority</option>
-            </select>
 
-            <select value = {completedFilter} onChange = {handleCompletedChange}>
-                <option value = {0}>All Items</option>
-                <option value = {1}>All Completed Items</option>
-                <option value = {2}>All Uncompleted Items</option>
-            </select>
+                <select value = {priorityFilter} onChange = {handlePrioriytChange}style={{
+                    width: '100%',
+                    fontSize: '1.1rem',
+                    padding: '8ppx 12px',
+                }}>
+                    <option value = {0}>All Priorities</option>
+                    <option value = {1}>High Priority</option>
+                    <option value = {2}>Medium Priority</option>
+                    <option value = {3}>Low Priority</option>
+                </select>
 
-            <button style = {{ border: '1px solid black', marginLeft: 10}} onClick = {handleQuerySearch}>Search</button>
+                <select value = {completedFilter} onChange = {handleCompletedChange}
+                    style={{
+                        width: '100%',
+                        fontSize: '1.1rem',
+                        padding: '8ppx 12px',
+                }}>
+                    <option value = {0}>All Items</option>
+                    <option value = {1}>All Completed Items</option>
+                    <option value = {2}>All Uncompleted Items</option>
+                </select>
+            </div>
+
         </div>
     )
 
