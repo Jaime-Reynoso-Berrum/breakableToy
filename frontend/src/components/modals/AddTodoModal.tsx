@@ -1,18 +1,27 @@
-import {useState} from "react";
 
-interface AddModalProps {
+type AddModalProps = {
+    todoItem: string;
+    setTodoItem: (value: string) => void;
+    priority: number;
+    setPriority: (value: number) => void;
+    dueDate: string | null;
+    setDueDate: (value: string | null) => void;
     onClose: () => void;
-    onSubmit: (todoItem: string, priority: number, dueDate: string | null) => void;
-}
+    onSubmit: () => void;
+};
 
-function AddTodoModal({ onClose, onSubmit }: AddModalProps){
-    const [todoItem, setTodoItem] = useState('');
-    const [priority, setPriority] = useState(1);
-    const [dueDate, setDueDate] = useState<string | null > (null);
-
-    const handleSubmit = () => {
-        onSubmit(todoItem, priority, dueDate);
-        onClose();
+function AddTodoModal({
+    todoItem,
+    setTodoItem,
+    priority,
+    setPriority,
+    dueDate,
+    setDueDate,
+    onClose,
+    onSubmit,
+    }: AddModalProps){
+        const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setPriority(parseInt(e.target.value));
     };
 
     return (
@@ -44,6 +53,7 @@ function AddTodoModal({ onClose, onSubmit }: AddModalProps){
                     Todo Item:<br />
                     <input
                         type = "text"
+                        placeholder = "Todo description"
                         value = {todoItem}
                         onChange = {e => setTodoItem(e.target.value)}
                         style = {{ width: '100%', marginBottom: '12px' }}
@@ -51,14 +61,12 @@ function AddTodoModal({ onClose, onSubmit }: AddModalProps){
                 </label>
                 <label>
                     Priority:<br />
-                    <input
-                        type = "number"
-                        min={1}
-                        max={3}
-                        value = {priority}
-                        onChange = {e => setPriority(parseInt(e.target.value))}
-                        style = {{ width: '100%', marginBottom: '12px' }}
-                    />
+
+                    <select value = {priority} onChange = {handlePriorityChange} style = {{ width: '100%', marginBottom: '16px' }}>
+                        <option value = {1}>High Priority</option>
+                        <option value = {2}>Medium Priority</option>
+                        <option value = {3}>Low Priority</option>
+                    </select>
                 </label>
                 <label>
                     Due date (optional):<br />
@@ -72,7 +80,7 @@ function AddTodoModal({ onClose, onSubmit }: AddModalProps){
                         <button onClick = {onClose} style = {{ padding: '8px 16px' }}>
                             Cancel
                         </button>
-                        <button onClick = {handleSubmit} style = {{ padding: '8px 16px' }}>
+                        <button onClick = {onSubmit} style = {{ padding: '8px 16px' }}>
                             Add Todo Item
                         </button>
                     </div>

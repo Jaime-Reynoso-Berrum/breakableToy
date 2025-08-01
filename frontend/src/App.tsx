@@ -5,17 +5,25 @@ import EditTodoModal from "./components/modals/EditTodoModal.tsx"
 import FilterBar from "./components/FilterBar.tsx";
 import MetricsFooter from "./components/MetricsFooter.tsx";
 import ListContainer from "./components/ListContainer.tsx";
-import {addTodo, completeTodo, editTodo, filterByQuery, getMetrics, undoCompleteTodo} from "./api/api.ts";
+import {
+    addTodo,
+    completeTodo,
+    editTodo, filterByCompleted,
+    filterByPriority,
+    filterByQuery,
+    getMetrics, getOriginalList,
+    undoCompleteTodo
+} from "./api/api.ts";
 import type {Todo} from "./types/AddTodoRequest.tsx";
 
 
 function App() {
-  // dummy todo data
-  const [todos, setTodos] = useState<Todo[]>([
-      { id: '1', todoItem: 'Test item 1', priority: 2, creationDate: '', doneDate: '', dueDate:'2025-08-01T08:00', completed: false, deleteFlag: false},
-      { id: '2', todoItem: 'Test item 2', priority: 1, creationDate: '', doneDate: '', dueDate: '', completed: false, deleteFlag:false},
+  const [todos, setTodos] = useState<Todo[]>([]);
 
-  ])
+  const [newTodoItem, setNewTodoItem] = useState('');
+  const [newPriority, setNewPriority] = useState(1);
+  const [newDueDate, setNewDueDate] = useState<string | null>(null);
+
   const [AddModalOpen, setAddModalOpen] = useState(false);
   const [EditModalOpen, setEditModalOpen] = useState(false);
   const [EditingTodo, setEditingTodo] = useState<Todo | null>(null);
@@ -37,23 +45,24 @@ function App() {
   //     metricsOnLaunch();
   // }, []);
 
-  const handleAdd = async (todoItem: string, priority: number, dueDate: string | null) => {
-      console.log("New todo: ", {todoItem, priority, dueDate });
+  const handleAdd = async () => {
 
       try {
-          const newTodo = await addTodo({todoItem, priority, dueDate,});
-
+          const newTodo = await addTodo({todoItem: newTodoItem, priority: newPriority, dueDate: newDueDate,});
           setTodos(prev => [...prev, newTodo]);
       } catch (error) {
           console.error("Error adding Todo", error);
       }
+      setNewTodoItem('');
+      setNewPriority(1);
+      setNewDueDate(null);
       setAddModalOpen(false);
   }
 
   const openEditModal = (todo: Todo) => {
       setEditingTodo(todo);
       setEditModalOpen(true);
-}
+      }
   const handleEdit = async ( id: string, todoItem: string, priority: number, dueDate: string, deleteFlag: boolean = false) => {
       console.log('Editing todo item: ', {id, todoItem, priority, dueDate, deleteFlag });
 
@@ -79,10 +88,6 @@ function App() {
 
     }
 
-    const handleQueryFilter = async () => {
-      const filtered = await filterByQuery(queryFilter);
-      setTodos(filtered);
-    }
 
     const CompleteItem = async (id: string) => {
       const todo  = todos.find(todo => todo.id === id);
@@ -106,6 +111,27 @@ function App() {
       }
   }
 
+  const handleFilterChange = async () => {
+      try {
+          let filtered: Todo[] = [];
+
+          if (queryFilter.trim() !== "") {
+              filtered = await filterByQuery(queryFilter);
+          } else if (priorityFilter !== 0) {
+              filtered = await filterByPriority(priorityFilter);
+          } else if (completedFilter !== null) {
+              filtered = await filterByCompleted(completedFilter);
+          } else {
+              filtered = await getOriginalList();
+          }
+
+          setTodos(filtered);
+      } catch (e) {
+          console.log("Filter failed", e);
+      }
+
+  }
+
   return (
     <>
         <FilterBar
@@ -115,7 +141,7 @@ function App() {
         setPriorityFilter={setPriorityFilter}
         completedFilter={completedFilter}
         setCompletedFilter={setCompletedFilter}
-        onQueryFilter={handleQueryFilter}
+        onFilterChange={handleFilterChange}
         />
         <div>
             <button style = {{ border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
@@ -130,6 +156,12 @@ function App() {
 
             {AddModalOpen && (
                 <AddTodoModal
+                    todoItem={newTodoItem}
+                    setTodoItem={setNewTodoItem}
+                    priority={newPriority}
+                    setPriority={setNewPriority}
+                    dueDate={newDueDate}
+                    setDueDate={setNewDueDate}
                     onClose={() => setAddModalOpen(false)}
                     onSubmit={handleAdd}
                 />

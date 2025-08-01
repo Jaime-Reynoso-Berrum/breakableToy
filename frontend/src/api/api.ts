@@ -58,14 +58,14 @@ export async function filterByQuery(queryFilter: string): Promise<Todo[]> {
     return await response.json();
 }
 
-export async function fitlerByPriority(priorityFilter: number): Promise<Todo[]> {
+export async function filterByPriority(priorityFilter: number): Promise<Todo[]> {
     const response = await fetch(`${BASE_URL}/filter/priority?priorityFilter=${priorityFilter}`);
     if (!response.ok) throw new Error("Failed to filter by priority");
 
     return await response.json();
 }
 
-export async function filterByCompleted(completedFilter: boolean): Promise<Todo[]> {
+export async function filterByCompleted(completedFilter: 0 | 1 | 2): Promise<Todo[]> {
     const response = await fetch(`${BASE_URL}/filter/completed?completedFilter?${completedFilter}`);
     if (!response.ok) throw new Error("Failed to filter by completed");
 
@@ -80,4 +80,12 @@ export async function sortedFinalList(
     if (!response.ok) throw new Error("Failed to sort");
 
     return await response.json();
+}
+
+export async function getOriginalList(): Promise<Todo[]> {
+    const response = await fetch(BASE_URL);
+    if (!response.ok) throw new Error("Failed to grab list");
+
+    return await response.json();
+
 }

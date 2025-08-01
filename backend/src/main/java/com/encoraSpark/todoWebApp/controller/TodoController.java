@@ -5,10 +5,12 @@ import com.encoraSpark.todoWebApp.dto.TodoInput;
 import com.encoraSpark.todoWebApp.model.Todo;
 import com.encoraSpark.todoWebApp.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
@@ -31,21 +33,20 @@ public class TodoController {
 
     // edits a todoo item
     @PutMapping("/{id}")
-    public Todo editTodo(@PathVariable UUID id,
+    public ResponseEntity<?> editTodo(@PathVariable UUID id,
                          @RequestBody TodoEdit todoEdit) {
-        if(todoEdit.getDueDate() == null){
-            return todoService.editTodo(id,
-                    todoEdit.getTodoItem(),
-                    todoEdit.getPriority(),
-                    null,
-                    todoEdit.getDeleted());
-        } else {
 
-            return todoService.editTodo(id,
-                    todoEdit.getTodoItem(),
-                    todoEdit.getPriority(),
-                    todoEdit.getDueDate(),
-                    todoEdit.getDeleted());
+        Todo edited = todoService.editTodo(id,
+                                           todoEdit.getTodoItem(),
+                                           todoEdit.getPriority(),
+                                           todoEdit.getDueDate(),
+                                           todoEdit.getDeleted()
+        );
+
+        if (edited == null){
+            return ResponseEntity.ok().body(Map.of("message", "Todo deleted"));
+        } else {
+            return ResponseEntity.ok(edited);
         }
     }
 
@@ -78,7 +79,7 @@ public class TodoController {
     }
 
     @GetMapping("/filter/completed")
-    public List<Todo> getCompletedFilter(@RequestParam Boolean completedFilter) {
+    public List<Todo> getCompletedFilter(@RequestParam int completedFilter) {
         return todoService.setCompletedFilter(completedFilter);
     }
 
@@ -86,5 +87,10 @@ public class TodoController {
     public List<Todo> sortFinalList(@RequestParam(defaultValue = "true") boolean ascending,
                                      @RequestParam(defaultValue = "true") boolean sortByDueDate) {
         return todoService.sortFinalList(ascending, sortByDueDate);
+    }
+
+    @GetMapping
+    public List<Todo> getList() {
+        return todoService.getOriginalList();
     }
 }

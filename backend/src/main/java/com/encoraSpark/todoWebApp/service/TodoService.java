@@ -20,7 +20,7 @@ public class TodoService {
     public Duration lowTimeCompletion = Duration.ZERO;
     private String currentQueryFilter = "";
     private int currentPriorityFilter = 0;
-    private Boolean currentCompleted = null;
+    private int currentCompleted = 0;
     private boolean currentAscending = true;
     private boolean currentSortByDueDate = true;
 
@@ -117,7 +117,8 @@ public class TodoService {
         return finalList;
     }
 
-    public List<Todo> setCompletedFilter(Boolean completedFilter){
+    // 0 = all, 1 = completd, 2 = not completed
+    public List<Todo> setCompletedFilter(int completedFilter){
         currentCompleted = completedFilter;
         updateList();
         return finalList;
@@ -182,13 +183,15 @@ public class TodoService {
     }
 
     // filters todo list by completed or not
-    private List<Todo> filterByComplete(List<Todo> list, Boolean completed){
-        if(completed == null) return list;
+    private List<Todo> filterByComplete(List<Todo> list, int completed){
+        if(completed == 0) return list;
 
         List<Todo>  completedList = new ArrayList<>();
 
+
         for (Todo todo: list){
-            if (todo.isCompleted() == completed){
+            int status = todo.isCompleted() ? 1 : 2;
+            if (status == completed){
                 completedList.add(todo);
             }
         }
