@@ -16,6 +16,7 @@ public class TodoEdit {
     public boolean getDeleted() {return deleted;}
 
     public LocalDateTime getDueDate() {
+        if (dueDate == null|| dueDate.trim().isEmpty()) { return null;}
         try {
             return LocalDateTime.parse(dueDate);
         } catch (DateTimeParseException e){
@@ -27,9 +28,11 @@ public class TodoEdit {
     public void setPriority(int priority) {this.priority = priority;}
     public void setDeleted(boolean deleted) {this.deleted = deleted;}
 
-    public void setDueDate(String dueDate) {
-        if (dueDate == null || dueDate.trim().isEmpty()) {
-            this.dueDate = null;
-        }
-        this.dueDate = dueDate;}
+//    public void setDueDate(String dueDate) {
+//        if (dueDate == null || dueDate.trim().isEmpty()) {
+//            this.dueDate = null;
+//            return;
+//        }
+//        this.dueDate = dueDate;
+//    }
 }

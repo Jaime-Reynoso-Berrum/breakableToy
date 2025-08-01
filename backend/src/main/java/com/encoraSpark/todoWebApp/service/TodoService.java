@@ -123,44 +123,12 @@ public class TodoService {
         return finalList;
     }
 
-    //sorts todo objects by their due date and priority
-    public List<Todo> sortedTodos(List<Todo> filteredList, Boolean ascending, Boolean sortByDuedate){
-        List<Todo> sortedList = new ArrayList<>(filteredList);
-
-
-        Comparator<Todo> comparator = new Comparator<Todo>() {
-            @Override
-            public int compare(Todo item1, Todo item2) {
-                int result;
-
-                if (ascending == null && sortByDuedate == null) { return 0; }
-
-                // sorts by due date first, and then by priority
-                if (sortByDuedate) {
-
-                    result = sortByDueDate(item1, item2);
-                    if (result == 0) {
-                        result = sortByPriority(item1, item2);
-                    }
-                } else {
-                    // sorts by priority first, then by due date
-                    result = sortByPriority(item1, item2);
-                    if (result == 0) {
-                        result = sortByDueDate(item1, item2);
-                    }
-                }
-
-                if (ascending) { return result; }
-                else{
-                    return -result;
-                }
-            }
-        };
-
-        Collections.sort(sortedList, comparator);
-        return sortedList;
+    public List<Todo> sortFinalList(boolean ascending, boolean descending){
+        this.currentAscending = ascending;
+        this.currentSortByDueDate = descending;
+        updateList();
+        return finalList;
     }
-
 
     // endregion *******
 
@@ -225,6 +193,43 @@ public class TodoService {
             }
         }
         return completedList;
+    }
+
+    //sorts todo objects by their due date and priority
+    private List<Todo> sortedTodos(List<Todo> filteredList, Boolean ascending, Boolean sortByDuedate){
+        List<Todo> sortedList = new ArrayList<>(filteredList);
+
+        Comparator<Todo> comparator = new Comparator<Todo>() {
+            @Override
+            public int compare(Todo item1, Todo item2) {
+                int result;
+
+                if (ascending == null && sortByDuedate == null) { return 0; }
+
+                // sorts by due date first, and then by priority
+                if (sortByDuedate) {
+
+                    result = sortByDueDate(item1, item2);
+                    if (result == 0) {
+                        result = sortByPriority(item1, item2);
+                    }
+                } else {
+                    // sorts by priority first, then by due date
+                    result = sortByPriority(item1, item2);
+                    if (result == 0) {
+                        result = sortByDueDate(item1, item2);
+                    }
+                }
+
+                if (ascending) { return result; }
+                else{
+                    return -result;
+                }
+            }
+        };
+
+        Collections.sort(sortedList, comparator);
+        return sortedList;
     }
 
     // compares due dates of two items to sort them

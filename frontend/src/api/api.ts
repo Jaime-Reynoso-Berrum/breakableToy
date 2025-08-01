@@ -48,12 +48,36 @@ export async function getMetrics(): Promise<string[]> {
     return response.json();
 }
 
-export async function filterByQuery(query: string): Promise<Todo[]> {
-    const encodedQuery = encodeURIComponent(query);
-    const response = await fetch(`${BASE_URL}/filter/query?query=${encodedQuery}`, {
+export async function filterByQuery(queryFilter: string): Promise<Todo[]> {
+    const encodedQuery = encodeURIComponent(queryFilter);
+    const response = await fetch(`${BASE_URL}/filter/queryFilter?queryFilter=${encodedQuery}`, {
         headers: { "Content-Type": "application/json" },
     });
     if (!response.ok) throw new Error("Failed to filter todos by query");
 
-    return response.json();
+    return await response.json();
+}
+
+export async function fitlerByPriority(priorityFilter: number): Promise<Todo[]> {
+    const response = await fetch(`${BASE_URL}/filter/priority?priorityFilter=${priorityFilter}`);
+    if (!response.ok) throw new Error("Failed to filter by priority");
+
+    return await response.json();
+}
+
+export async function filterByCompleted(completedFilter: boolean): Promise<Todo[]> {
+    const response = await fetch(`${BASE_URL}/filter/completed?completedFilter?${completedFilter}`);
+    if (!response.ok) throw new Error("Failed to filter by completed");
+
+    return await response.json();
+}
+
+export async function sortedFinalList(
+    ascending: boolean,
+    sortByDueDate: boolean
+): Promise<Todo> {
+    const response = await fetch(`${BASE_URL}/sort?ascending=${ascending}&sortbyDueDate=${sortByDueDate}`);
+    if (!response.ok) throw new Error("Failed to sort");
+
+    return await response.json();
 }

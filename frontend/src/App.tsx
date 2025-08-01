@@ -25,17 +25,17 @@ function App() {
   const [completedFilter, setCompletedFilter] = useState<boolean | null>(null);
   const [metrics, setMetrics] = useState<string[]>([]);
 
-  useEffect(() => {
-      const metricsOnLaunch = async () => {
-          try {
-              const data = await getMetrics();
-              setMetrics(data);
-          } catch (error){
-              console.log("Failed to grab metrics", error);
-          }
-      };
-      metricsOnLaunch();
-  }, []);
+  // useEffect(() => {
+  //     const metricsOnLaunch = async () => {
+  //         try {
+  //             const data = await getMetrics();
+  //             setMetrics(data);
+  //         } catch (error){
+  //             console.log("Failed to grab metrics", error);
+  //         }
+  //     };
+  //     metricsOnLaunch();
+  // }, []);
 
   const handleAdd = async (todoItem: string, priority: number, dueDate: string | null) => {
       console.log("New todo: ", {todoItem, priority, dueDate });

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/todos")
 public class TodoController {
@@ -33,14 +33,20 @@ public class TodoController {
     @PutMapping("/{id}")
     public Todo editTodo(@PathVariable UUID id,
                          @RequestBody TodoEdit todoEdit) {
+        if(todoEdit.getDueDate() == null){
+            return todoService.editTodo(id,
+                    todoEdit.getTodoItem(),
+                    todoEdit.getPriority(),
+                    null,
+                    todoEdit.getDeleted());
+        } else {
 
-
-        System.out.println(todoEdit.getTodoItem());
-        return todoService.editTodo(id,
-                                    todoEdit.getTodoItem(),
-                                    todoEdit.getPriority(),
-                                    todoEdit.getDueDate(),
-                                    todoEdit.getDeleted());
+            return todoService.editTodo(id,
+                    todoEdit.getTodoItem(),
+                    todoEdit.getPriority(),
+                    todoEdit.getDueDate(),
+                    todoEdit.getDeleted());
+        }
     }
 
     // complete a todo item
@@ -72,14 +78,13 @@ public class TodoController {
     }
 
     @GetMapping("/filter/completed")
-    public List<Todo> getCompletedFilter(@RequestParam Boolean completed) {
-        return todoService.setCompletedFilter(completed);
+    public List<Todo> getCompletedFilter(@RequestParam Boolean completedFilter) {
+        return todoService.setCompletedFilter(completedFilter);
     }
 
     @GetMapping("/sort")
-    public List<Todo> getSortedTodos(@RequestParam List<Todo> filteredList,
-                                     @RequestParam(defaultValue = "true") boolean ascending,
-                                     @RequestParam(defaultValue = "true") Boolean sortByDueDate) {
-        return todoService.sortedTodos(filteredList, ascending, sortByDueDate);
+    public List<Todo> sortFinalList(@RequestParam(defaultValue = "true") boolean ascending,
+                                     @RequestParam(defaultValue = "true") boolean sortByDueDate) {
+        return todoService.sortFinalList(ascending, sortByDueDate);
     }
 }
