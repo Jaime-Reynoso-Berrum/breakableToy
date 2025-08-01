@@ -30,7 +30,7 @@ function App() {
 
   const [queryFilter, setQueryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<number>(0);
-  const [completedFilter, setCompletedFilter] = useState<boolean | null>(null);
+  const [completedFilter, setCompletedFilter] = useState<0 | 1| 2>(0);
   const [metrics, setMetrics] = useState<string[]>([]);
 
   // useEffect(() => {
@@ -119,7 +119,7 @@ function App() {
               filtered = await filterByQuery(queryFilter);
           } else if (priorityFilter !== 0) {
               filtered = await filterByPriority(priorityFilter);
-          } else if (completedFilter !== null) {
+          } else if (completedFilter !== 0) {
               filtered = await filterByCompleted(completedFilter);
           } else {
               filtered = await getOriginalList();

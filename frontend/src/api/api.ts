@@ -66,7 +66,7 @@ export async function filterByPriority(priorityFilter: number): Promise<Todo[]> 
 }
 
 export async function filterByCompleted(completedFilter: 0 | 1 | 2): Promise<Todo[]> {
-    const response = await fetch(`${BASE_URL}/filter/completed?completedFilter?${completedFilter}`);
+    const response = await fetch(`${BASE_URL}/filter/completed?completedFilter${completedFilter}`);
     if (!response.ok) throw new Error("Failed to filter by completed");
 
     return await response.json();

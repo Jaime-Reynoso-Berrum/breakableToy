@@ -4,8 +4,8 @@ type FilterBarProps = {
     setQueryFilter: (query: string) => void;
     priorityFilter: number;
     setPriorityFilter: (priority: number) => void;
-    completedFilter: boolean | null;
-    setCompletedFilter: (completed: boolean | null) => void;
+    completedFilter: 0 | 1 | 2;
+    setCompletedFilter: (completed: 0 | 1 | 2) => void;
     onFilterChange: () => void;
 }
 
@@ -19,16 +19,15 @@ function FilterBar ({
     onFilterChange
 }: FilterBarProps) {
     const handleCompletedChange = (event: React.ChangeEvent<HTMLSelectElement>)=> {
-        const value = event.target.value;
-        if (value === "true") setCompletedFilter(true);
-        else if (value === "false") setCompletedFilter(false);
-        else setCompletedFilter(null);
-        onFilterChange();
+        const value = Number(event.target.value);
+        if (value == 0 || value == 1 || value == 2) {
+            setCompletedFilter(value);
+            onFilterChange();
+        }
     }
 
     const handlePrioriytChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const number = parseInt(event.target.value, 10);
-        setPriorityFilter(number);
+        setPriorityFilter(Number(event.target.value));
         onFilterChange();
     };
 
@@ -59,10 +58,10 @@ function FilterBar ({
                 <option value = {3}>Low Priority</option>
             </select>
 
-            <select value = {String(completedFilter)} onChange = {handleCompletedChange}>
-                <option value = 'null'>All Items</option>
-                <option value = 'true'>All Completed Items</option>
-                <option value = 'false'>All Uncompleted Items</option>
+            <select value = {completedFilter} onChange = {handleCompletedChange}>
+                <option value = {0}>All Items</option>
+                <option value = {1}>All Completed Items</option>
+                <option value = {2}>All Uncompleted Items</option>
             </select>
 
             <button style = {{ border: '1px solid black', marginLeft: 10}} onClick = {handleQuerySearch}>Search</button>
