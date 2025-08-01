@@ -9,8 +9,7 @@ import {
     addTodo,
     completeTodo,
     editTodo,
-    getCombinedFilters,
-    getMetrics,
+    getMetrics, getTodos,
     undoCompleteTodo
 } from "./api/api.ts";
 import type {Todo} from "./types/AddTodoRequest.tsx";
@@ -18,6 +17,12 @@ import type {Todo} from "./types/AddTodoRequest.tsx";
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [queryFilter, setQueryFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<number>(0);
+  const [completedFilter, setCompletedFilter] = useState<0 | 1| 2>(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ascending, setAscending] = useState(true);
+  const [sortByDueDate, setSortByDueDate] = useState(true);
 
   const [newTodoItem, setNewTodoItem] = useState('');
   const [newPriority, setNewPriority] = useState(1);
@@ -27,9 +32,6 @@ function App() {
   const [EditModalOpen, setEditModalOpen] = useState(false);
   const [EditingTodo, setEditingTodo] = useState<Todo | null>(null);
 
-  const [queryFilter, setQueryFilter] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState<number>(0);
-  const [completedFilter, setCompletedFilter] = useState<0 | 1| 2>(0);
   const [metrics, setMetrics] = useState<string[]>([]);
 
   // useEffect(() => {
@@ -56,6 +58,7 @@ function App() {
       setNewPriority(1);
       setNewDueDate(null);
       setAddModalOpen(false);
+      handleFilterChange();
   }
 
   const openEditModal = (todo: Todo) => {
@@ -87,7 +90,6 @@ function App() {
 
     }
 
-
     const CompleteItem = async (id: string) => {
       const todo  = todos.find(todo => todo.id === id);
       if (!todo) return;
@@ -112,13 +114,13 @@ function App() {
 
   const handleFilterChange = useCallback(async () => {
       try {
-          const filtered = await getCombinedFilters(queryFilter, priorityFilter, completedFilter);
+          const filtered = await getTodos(queryFilter, priorityFilter, completedFilter,  currentPage, ascending, sortByDueDate);
 
           setTodos(filtered);
       } catch (e) {
           console.log("Filter failed", e);
       }
-  }, [queryFilter, priorityFilter, completedFilter]);
+  }, [queryFilter, priorityFilter, completedFilter, currentPage, ascending, sortByDueDate]);
 
   useEffect(() => {
             handleFilterChange();
@@ -145,7 +147,24 @@ function App() {
                 CompleteItem={CompleteItem}
                 onEdit={openEditModal}
             />
-
+            <div style={{ margin: "1rem" }}>
+                <button onClick={() => setSortByDueDate(prev => !prev)}>
+                    Sort by: {sortByDueDate ? "Due Date" : "Priority"}
+                </button>
+                <button onClick={() => setAscending(prev => !prev)}>
+                    Order : {ascending  ? "Ascending" : "Descending"}
+                </button>
+                <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    >
+                    Prev Page
+                </button>
+                <span> Page {currentPage} </span>
+                <button
+                    onClick={() => setCurrentPage(p => p + 1)}>Next Page
+                </button>
+            </div>
 
             {AddModalOpen && (
                 <AddTodoModal

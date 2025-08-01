@@ -12,7 +12,7 @@ export async function addTodo(todo: Omit<Todo, "id" | "creationDate" | "doneDate
     });
 
     if (!response.ok) throw new Error("Failed to add task");
-    return response.json();
+    return await response.json();
 }
 
 //edits a todo item
@@ -24,7 +24,7 @@ export async function editTodo(id: string, updated: EditTodoRequest): Promise<To
     });
     if (!response.ok) throw new Error("Failed to add task");
 
-    return response.json();
+    return await response.json();
 }
 
 // completes a todo item
@@ -32,7 +32,7 @@ export async function completeTodo(id: string): Promise<Todo> {
     const response = await fetch(`${BASE_URL}/complete/${id}`, {
         method: "POST",
     });
-    return response.json();
+    return await response.json();
 }
 
 // uncompletes a todo item
@@ -40,7 +40,7 @@ export async function undoCompleteTodo(id: string): Promise<Todo> {
     const response = await fetch(`${BASE_URL}/undo/${id}`, {
         method: "POST",
     });
-    return response.json();
+    return await response.json();
 }
 
 export async function getMetrics(): Promise<string[]> {
@@ -48,40 +48,27 @@ export async function getMetrics(): Promise<string[]> {
     return response.json();
 }
 
-export async function getCombinedFilters(queryFilter: string, priorityFilter: number, completedFilter: 0| 1 | 2): Promise<Todo[]> {
-    const params = new URLSearchParams();
-
-    if (queryFilter.trim() !== "") {
-        params.append('queryFilter', queryFilter);
-    }
-    if (priorityFilter !== 0) {
-        params.append('priorityFilter', priorityFilter.toString());
-    }
-    if(completedFilter !== 0){
-        params.append('completedFilter', completedFilter.toString());
-    }
-
-    const response = await fetch(`${BASE_URL}/filter/combined?${params}`, {
-        headers: { "Content-Type": "application/json" },
-    });
-    if (!response.ok) throw new Error("Failed to filter");
-    return await response.json();
-}
-
-export async function sortedFinalList(
+export async function getTodos(
+    query: string,
+    priority: number,
+    completed: number,
+    page: number,
     ascending: boolean,
     sortByDueDate: boolean
-): Promise<Todo> {
-    const response = await fetch(`${BASE_URL}/sort?ascending=${ascending}&sortbyDueDate=${sortByDueDate}`);
-    if (!response.ok) throw new Error("Failed to sort");
+): Promise<Todo[]> {
+    const params = new URLSearchParams({
+        query,
+        priority: priority.toString(),
+        completed: completed.toString(),
+        page: page.toString(),
+        ascending: ascending.toString(),
+        sortByDueDate: sortByDueDate.toString(),
+    });
+
+    const response = await fetch(`${BASE_URL}?${params}`);
+
+    if (!response.ok) throw new Error("Failed to add task");
 
     return await response.json();
 }
 
-export async function getOriginalList(): Promise<Todo[]> {
-    const response = await fetch(BASE_URL);
-    if (!response.ok) throw new Error("Failed to grab list");
-
-    return await response.json();
-
-}

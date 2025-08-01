@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -68,21 +67,18 @@ public class TodoController {
         return todoService.getAvgCompletionTime();
     }
 
-    @GetMapping("/filter/combined")
-    public List<Todo> getCombinedFilters(@RequestParam(required = false, defaultValue = "") String queryFilter,
-                                         @RequestParam(defaultValue = "0") int priorityFilter,
-                                         @RequestParam(defaultValue = "0") int completedFilter) {
-        return todoService.getFilteredTodos(queryFilter, priorityFilter, completedFilter);
-    }
-
-    @GetMapping("/sort")
-    public List<Todo> sortSortedList(@RequestParam(defaultValue = "true") boolean ascending,
-                                     @RequestParam(defaultValue = "true") boolean sortByDueDate) {
-        return todoService.sortSortedList(ascending, sortByDueDate);
-    }
-
     @GetMapping
-    public List<Todo> getList() {
-        return todoService.getOriginalList();
+    public List<Todo> getTodos(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int priority,
+            @RequestParam(defaultValue = "0") int completed,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "true") boolean ascending,
+            @RequestParam(defaultValue = "true") boolean sortByDueDate) {
+
+        todoService.getFilteredTodos(query, priority, completed);
+        todoService.sortedTodos(ascending, sortByDueDate);
+        return todoService.paginateTodos(page);
     }
+
 }
