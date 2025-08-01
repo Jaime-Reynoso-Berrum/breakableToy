@@ -144,7 +144,7 @@ function App() {
                     padding: '0.5rem 1rem',
 
                 }}>
-                <button style = {{ marginRight: '10rem', border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
+                <button style = {{ marginRight: '15rem', border: '1px solid black'}} onClick={() => setAddModalOpen(true)}>Add a Todo Item</button>
 
                 <div style={{display: 'flex', justifyContent: 'flex-end', gap: '0.5rem'}}>
                     <button onClick={() => setSortByDueDate(prev => !prev)} style = {{ marginRight: '8px', border: '1px solid black'}}>
@@ -158,6 +158,7 @@ function App() {
             </div>
 
         <div>
+            <h1>My Todo List</h1>
             <ListContainer
                 todos={todos}
                 CompleteItem={CompleteItem}

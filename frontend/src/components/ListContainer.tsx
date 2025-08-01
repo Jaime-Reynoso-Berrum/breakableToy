@@ -12,11 +12,6 @@ function ListContainer(props: TodoItemProps){
 
     return(
         <div>
-            <h2 style={{position: 'fixed',
-                top: '190px',
-                right: '25rem',
-                left: '25rem',}}>My Todo List</h2>
-
             <div
                 style = {{
                     border: '1px solid black',
@@ -24,10 +19,6 @@ function ListContainer(props: TodoItemProps){
                     gridTemplateColumns: '1fr 4fr 2fr 3fr 2fr',
                     fontWeight: 'bold',
                     backgroundColor: 'lightgray',
-                    position: 'fixed',
-                    top: '250px',
-                    right: '25rem',
-                    left: '25rem',
                     }}
                 >
                 <div style={{ border: '1px solid black', padding: '8px'}}>Done</div>
