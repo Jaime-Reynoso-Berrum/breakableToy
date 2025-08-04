@@ -151,6 +151,7 @@ public class TodoService {
         return sortedList;
     }
 
+    // paginates the list into only 10 items
     public List<Todo> paginateTodos(List<Todo> list, int pageNumber){
         if (list == null || list.isEmpty()) { return new ArrayList<>(); }
 
@@ -204,6 +205,7 @@ public class TodoService {
     }
 
     // filters todo list by completed or not
+    // 1 = completed, 2 = uncompleted
     private List<Todo> filterByComplete(List<Todo> list, int completed){
         List<Todo> completedList = new ArrayList<>();
 
