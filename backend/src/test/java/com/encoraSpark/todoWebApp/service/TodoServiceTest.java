@@ -19,7 +19,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testAddTodoItem() {
+    public void testAddTodo() {
         String testString = "Add TodoItem Test";
         int priority = 0;
         LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
@@ -41,7 +41,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testDeleteTodoItem() {
+    public void testDeleteTodo() {
         Todo toBeDeleted = todoService.addTodo("Delete TodoItem test", 0, LocalDateTime.now());
         UUID id = toBeDeleted.getId();
 
@@ -52,12 +52,12 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testUpdateTodoItem() {
+    public void testEditTodo() {
         // original todo item
         String testString = "Update TodoItem Test: Did the fields update correctly";
         int priority = 0;
         LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
-        Todo addedTodo = todoService.addTodo(testString, priority, dueDate);
+        Todo testTodo = todoService.addTodo(testString, priority, dueDate);
 
         // new values to update todo item
         String updatedString = "Did the fields update correctly";
@@ -65,108 +65,175 @@ public class TodoServiceTest {
         LocalDateTime updatedDueDate = LocalDateTime.now().plusDays(5);
 
         // creating and testing the updated todo item
-        Todo updatedTodo = todoService.editTodo(addedTodo.getId(), updatedString, updatedPriority, updatedDueDate, false);
+        todoService.editTodo(testTodo.getId(), updatedString, updatedPriority, updatedDueDate, false);
 
-        assertNotNull(updatedTodo);
-        assertEquals(updatedString, updatedTodo.getTodoItem());
-        assertEquals(updatedPriority, updatedTodo.getPriority());
-        assertEquals(updatedDueDate, updatedTodo.getDueDate());
+        assertNotNull(testTodo);
+        assertEquals(updatedString, testTodo.getTodoItem());
+        assertEquals(updatedPriority, testTodo.getPriority());
+        assertEquals(updatedDueDate, testTodo.getDueDate());
     }
 
     @Test
     public void testCompleteTodoItem() {
         String testString = "Complete a TodoItem Test";
-        int priority = 0;
-        LocalDateTime dueDate = null;
-        Todo item = todoService.addTodo(testString, priority, dueDate);
-        item.setCreationDate(LocalDateTime.now().minusDays(3));
+        int priority = 1;
+        Todo testItem = todoService.addTodo(testString, priority, null);
+        testItem.setCreationDate(LocalDateTime.now().minusDays(3));
 
         // Completes the todo and verifies that it is marked complete
-        Todo itemComplete = todoService.completeTodoItem(item.getId());
-        assertTrue(itemComplete.isCompleted());
-        assertNotNull(itemComplete.getDoneDate());
+        todoService.completeTodoItem(testItem.getId());
+        assertTrue(testItem.isCompleted());
+        assertNotNull(testItem.getDoneDate());
 
-        // Tests if time completion is added to TotalTimeCompletion
-        // and checks if completedCount is incremented
-        Duration duration = Duration.between(itemComplete.getCreationDate(), itemComplete.getDoneDate());
-        assertEquals(duration, todoService.getTotalTimeCompletion());
-        assertEquals(1, todoService.getCompletedCount());
+        // Tests if time completion is added to highTimeCompletion
+        // and checks if highCompletedCount is incremented
+        Duration duration = Duration.between(testItem.getCreationDate(), testItem.getDoneDate());
+        assertEquals(duration, todoService.getHighTimeCompletion());
+        assertEquals(1, todoService.getHighCompletedCount());
     }
 
     @Test
-    public void testUndoCompleteTodoItem(){
+    public void testUndoCompleteTodoItem() {
         String testString = "Undo TodoItem Test";
-        int priority = 0;
-        LocalDateTime dueDate = null;
-        Todo item = todoService.addTodo(testString, priority, dueDate);
-        item.setCreationDate(LocalDateTime.now().minusDays(3));
+        int priority = 2;
+        Todo testItem = todoService.addTodo(testString, priority, null);
+        testItem.setCreationDate(LocalDateTime.now().minusDays(3));
 
         //completes todo and grabs duration time
-        Todo itemComplete = todoService.completeTodoItem(item.getId());
-        Duration duration = Duration.between(itemComplete.getCreationDate(), itemComplete.getDoneDate());
-
+        todoService.completeTodoItem(testItem.getId());
+        Duration duration = Duration.between(testItem.getCreationDate(), testItem.getDoneDate());
 
         // undos completing the todo and verifies that it is marked not complete
-        Todo undoComplete = todoService.undoCompleteTodoItem(item.getId());
+        Todo undoComplete = todoService.undoCompleteTodoItem(testItem.getId());
         assertFalse(undoComplete.isCompleted());
         assertNull(undoComplete.getDoneDate());
 
         // Tests if time durationo time is subtracted from TotalTimeCompletion
         // and checks if completedCount is reduced by 1
-        assertEquals(Duration.ZERO, todoService.getTotalTimeCompletion());
-        assertEquals(0, todoService.getCompletedCount());
+        assertEquals(Duration.ZERO, todoService.getMediumTimeCompletion());
+        assertEquals(0, todoService.getMediumCompletedCount());
     }
 
     @Test
-    public void testGetAvgTimeCompletion(){
+    public void testGetAvgTimeCompletion() {
+        LocalDateTime testTime = LocalDateTime.now();
 
-        // created 3 nodes and marks them completed
-        Todo item1 = todoService.addTodo("Test Item 1", 0, null);
-        item1.setCreationDate(LocalDateTime.now().minusDays(3));
-        todoService.completeTodoItem(item1.getId());
+        // created 10 nodes of each priority and marks them completed
+        for (int i = 1; i <= 30; i++) {
+            String testString = "Add Me to the List: #" + i;
+            int priority;
 
-        Todo item2 = todoService.addTodo("Test Item 2", 0, null);
-        item2.setCreationDate(LocalDateTime.now().minusHours(17));
-        todoService.completeTodoItem(item2.getId());
+            if (i <= 10) priority = 1;
+            else if (i <= 20) priority = 2;
+            else priority = 3;
 
-        Todo item3 = todoService.addTodo("Test Item 3", 0, null);
-        item3.setCreationDate(LocalDateTime.now().minusMinutes(58));
-        todoService.completeTodoItem(item3.getId());
+            Todo testItem = todoService.addTodo(testString, priority, null);
 
-        // average 1 day, 5 hours, 59 minutes, 20 seconds
-        String result = todoService.getAvgCompletionTime();
-        assertEquals("Days: 1   Hours: 5   Minutes: 59   Seconds: 20", result);
+            if (i <= 10) testItem.setCreationDate(testTime.minusDays(i));
+            else if (i <= 20) testItem.setCreationDate(testTime.minusHours(i));
+            else testItem.setCreationDate(testTime.minusMinutes(i));
+
+            todoService.completeTodoItem(testItem.getId());
+        }
+
+        // times calculated using a time calculator
+        String correctOverall = "Days: 2   Hours: 1   Minutes: 18   Seconds: 30";
+        String correctHigh = "Days: 5   Hours: 12   Minutes: 0   Seconds: 0";
+        String correctMedium = "Days: 0   Hours: 15   Minutes: 30   Seconds: 0";
+        String correctLow = "Days: 0   Hours: 0   Minutes: 25   Seconds: 30";
+
+        String[] expected = {correctOverall, correctHigh, correctMedium, correctLow};
+        String[] results = todoService.getAvgCompletionTime();
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], results[i]);
+        }
     }
 
     @Test
-    public void testUpdateList(){
-        LocalDateTime now = LocalDateTime.now();
+    public void testFilterTodos(){
+        LocalDateTime testTime = LocalDateTime.now();
+        List<Todo> results;
 
-        // 5 dumy objects that will be tested for sorting/filtering
-        Todo item1 = todoService.addTodo("Test Item 1: car", 1, now.plusHours(1));
-        Todo item2 = todoService.addTodo("Test Item 2: car", 1, now.plusHours(3));
-        Todo item3 = todoService.addTodo("Test Item 3: car", 2, null);
-        Todo item4 = todoService.addTodo("Test Item 4: truck", 0, null);
-        Todo item5 = todoService.addTodo("Test Item 5: truck", 3, null);
+        // created 30 todos
+        for (int i = 1; i <= 30; i++){
+            String testString = "Add Me to the List: #" + i;
+            int priority;
 
-        // tests if query search fliter and priority filter both work
-        List<Todo> result = todoService.updateList("car", 1, false, true);
-        assertEquals(2, result.size());
+            // 10 todos for each priority
+            if (i % 3 == 0) priority = 1;
+            else if (i % 3 == 1) priority = 2;
+            else priority = 3;
 
-        // tests to see if the sorting by due date in descending order works.
-        result = todoService.updateList("car", 1, false, false);
-        assertEquals(item2.getId(), result.get(0).getId());
+            // different strings added for filter tests
+            if ( i <= 16)      testString += "car";
+            else if ( i <= 23) testString += "phone";
+            else               testString += "honey";
 
-        item3.setCompleted(true);
-        item4.setCompleted(true);
-        item5.setCompleted(true);
+            // 15 out of 30 will be marked completed
+            Todo testItem = todoService.addTodo(testString, priority, null);
+            if (i % 2 == 0) todoService.completeTodoItem(testItem.getId());
+        }
+        // tests if completed filter works alone
+        results = todoService.getFilteredTodos("", 0, 1);
+        assertEquals(15, results.size());
 
-        // tests to see if query filter and completed filter work
-        result = todoService.updateList("truck", 0, true, false);
-        assertEquals(2, result.size());
+        // tests if query filter works alone
+        results = todoService.getFilteredTodos("one", 0, 0);
+        assertEquals(14, results.size());
 
-        // test to see if all filters work together correctly
-        result = todoService.updateList("truck", 3, true, false);
-        assertEquals(1, result.size());
+        // tests if priority filter works alone
+        results = todoService.getFilteredTodos("", 1, 0);
+        assertEquals(10, results.size());
+
+        // tests if all filters work together
+        results = todoService.getFilteredTodos("car", 1, 1);
+        assertEquals(2, results.size());
     }
+
+    @Test
+    public void testSortedTodoTodos(){
+        LocalDateTime testTime = LocalDateTime.now();
+
+        todoService.addTodo("Test Item 1", 2, testTime.plusHours(1));
+        todoService.addTodo("Test Item 2", 1, testTime.plusHours(3));
+        todoService.addTodo("Test Item 3", 1, testTime.plusHours(2));
+        todoService.addTodo("Test Item 4", 3, testTime.plusHours(4));
+        todoService.addTodo("Test Item 5", 2, null);
+
+        List<Todo> origialList = todoService.getOriginalList();
+
+        //descending by due date, then priority
+        List<Todo> sorted = todoService.sortedTodos(origialList, false, true);
+        assertEquals("Test Item 5", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 4", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 3", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 1", sorted.get(4).getTodoItem());
+
+        // ascending by due date, then priority
+        sorted = todoService.sortedTodos(origialList, true, true);
+        assertEquals("Test Item 1", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 3", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 4", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 5", sorted.get(4).getTodoItem());
+
+        //descending by priority, then due date
+        sorted = todoService.sortedTodos(origialList, false, false);
+        assertEquals("Test Item 4", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 5", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 1", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 3", sorted.get(4).getTodoItem());
+
+        //descending by priority, then due date
+        sorted = todoService.sortedTodos(origialList, true, false);
+        assertEquals("Test Item 3", sorted.get(0).getTodoItem());
+        assertEquals("Test Item 2", sorted.get(1).getTodoItem());
+        assertEquals("Test Item 1", sorted.get(2).getTodoItem());
+        assertEquals("Test Item 5", sorted.get(3).getTodoItem());
+        assertEquals("Test Item 4", sorted.get(4).getTodoItem());
+    }
+
 }

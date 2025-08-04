@@ -1,14 +1,18 @@
 package com.encoraSpark.todoWebApp.controller;
 
+import com.encoraSpark.todoWebApp.dto.TodoEdit;
+import com.encoraSpark.todoWebApp.dto.TodoInput;
 import com.encoraSpark.todoWebApp.model.Todo;
 import com.encoraSpark.todoWebApp.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/todos")
 public class TodoController {
@@ -18,46 +22,63 @@ public class TodoController {
 
     // adds a todo item
     @PostMapping
-    public Todo addTodo(@RequestParam String todoItem,
-                        @RequestParam int priority,
-                        @RequestParam LocalDateTime dueDate) {
-        return todoService.addTodo(todoItem, priority, dueDate);
+    public Todo addTodo(@RequestBody TodoInput todoInput) {
+        System.out.println(todoInput.getTodoItem());
+
+        return todoService.addTodo(todoInput.getTodoItem(),
+                                   todoInput.getPriority(),
+                                   todoInput.getDueDate());
     }
 
     // edits a todoo item
     @PutMapping("/{id}")
-    public Todo editTodo(@PathVariable UUID id,
-                         @RequestParam String todoItem,
-                         @RequestParam int priority,
-                         @RequestParam LocalDateTime dueDate,
-                         @RequestParam Boolean delete) {
-        return todoService.editTodo(id, todoItem, priority, dueDate, delete);
+    public ResponseEntity<?> editTodo(@PathVariable UUID id,
+                         @RequestBody TodoEdit todoEdit) {
+
+        Todo edited = todoService.editTodo(id,
+                                           todoEdit.getTodoItem(),
+                                           todoEdit.getPriority(),
+                                           todoEdit.getDueDate(),
+                                           todoEdit.getDeleted()
+        );
+
+        if (edited == null){
+            return ResponseEntity.ok().body(Map.of("message", "Todo deleted"));
+        } else {
+            return ResponseEntity.ok(edited);
+        }
     }
 
     // complete a todo item
-    @PostMapping("/{id}/complete")
+    @PostMapping("/complete/{id}")
     public Todo completeTodoItem(@PathVariable UUID id) {
         return todoService.completeTodoItem(id);
     }
 
     // undos marking an item as complete
-    @PostMapping("/{id}/undo")
+    @PostMapping("/undo/{id}")
     public Todo undoCompleteItem(@PathVariable UUID id) {
         return todoService.undoCompleteTodoItem(id);
     }
 
-    // filter and sorts the todo list
-    @GetMapping
-    public List<Todo> updateTodoList (@RequestParam(required = false, defaultValue = "") String query,
-                                      @RequestParam(required = false, defaultValue = "0") int priorityFilter,
-                                      @RequestParam(required = false) Boolean completed,
-                                      @RequestParam(required = false, defaultValue = "true") boolean ascending) {
-        return todoService.updateList(query, priorityFilter, completed, ascending);
-    }
-
-    // grabs the average completion time
+    // grabs the average completion time metrics
     @GetMapping("/averageCompletionTime")
-    public String getAvgCompletionTime() {
+    public String[] getMetrics() {
         return todoService.getAvgCompletionTime();
     }
+
+    @GetMapping
+    public List<Todo> getTodos(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int priority,
+            @RequestParam(defaultValue = "0") int completed,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "true") boolean ascending,
+            @RequestParam(defaultValue = "true") boolean sortByDueDate) {
+
+        List<Todo> filtered = todoService.getFilteredTodos(query, priority, completed);
+        List<Todo> sorted = todoService.sortedTodos(filtered, ascending, sortByDueDate);
+        return todoService.paginateTodos(sorted, page);
+    }
+
 }

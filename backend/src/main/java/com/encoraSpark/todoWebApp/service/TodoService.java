@@ -10,9 +10,16 @@ import java.util.*;
 @Service
 public class TodoService {
     private Map<UUID, Todo> todoItems = new HashMap<>();
-    private int completedCount;
-    public Duration totalTimeCompletion = Duration.ZERO;
+    private int totalCompletedCount;
+    private int highCompletedCount;
+    private int mediumCompletedCount;
+    private int lowCompletedCount;
+    private Duration totalTimeCompletion;
+    public Duration highTimeCompletion = Duration.ZERO;
+    public Duration mediumTimeCompletion = Duration.ZERO;
+    public Duration lowTimeCompletion = Duration.ZERO;
 
+    private List<Todo> originalList = new ArrayList<>();
 
     // region **** Business Methods ****
 
@@ -20,8 +27,8 @@ public class TodoService {
     public Todo addTodo(String todoItem, int priority, LocalDateTime dueDate){
         Todo newItem = new Todo(todoItem, priority, dueDate);
         todoItems.put(newItem.getId(), newItem);
+        originalList.add(newItem);
 
-        grabFilterSortState();
         return newItem;
     }
 
@@ -31,8 +38,8 @@ public class TodoService {
 
         // deletes the current item from todoItems hashmap and the list
         if(delete){
+            originalList.remove(currentItem);
             todoItems.remove(id);
-            grabFilterSortState();
             return null;
         }
 
@@ -40,43 +47,238 @@ public class TodoService {
         if(priority != currentItem.getPriority()){ currentItem.setPriority(priority);}
         if(dueDate != currentItem.getDueDate()){ currentItem.setDueDate(dueDate);}
 
-        grabFilterSortState();
         return currentItem;
     }
 
-    //marks the current todo item as completed/done and adds todoDuration time to totalTimeCompletion variable
+    //marks the current todo item as completed/done and adds todoDuration to metrics
     public Todo completeTodoItem(UUID id){
         Todo currentItem = todoItems.get(id);
         currentItem.setCompleted(true);
 
+        // calculates total duration time and adds it to metrics
         currentItem.setDoneDate(LocalDateTime.now());
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
-        totalTimeCompletion = totalTimeCompletion.plus(todoDuration);
-        completedCount++;
 
-        grabFilterSortState();
+        addTimeToMetrics(currentItem.getPriority(), todoDuration);
+
         return currentItem;
     }
 
-    //undos an item from being marked as completed/done and removes todoDuration time from totalTime
+    // undos an item from being marked as completed/done and removes todoDuration time from metrics
     public Todo undoCompleteTodoItem(UUID id){
         Todo currentItem = todoItems.get(id);
         currentItem.setCompleted(false);
 
+        // removes duration from metrics and sets items done date to null
         Duration todoDuration = Duration.between(currentItem.getCreationDate(), currentItem.getDoneDate());
-        totalTimeCompletion = totalTimeCompletion.minus(todoDuration);
-        completedCount--;
+        removeTimeFromMetrics(currentItem.getPriority(), todoDuration);
         currentItem.setDoneDate(null);
 
-        grabFilterSortState();
         return currentItem;
     }
 
-    // Returns the average completion time required for the metrics
-    public String getAvgCompletionTime(){
-        if (completedCount == 0) return "Complete a To Do item to find the average";
+    // Returns the average completion times required for the metrics
+    public String[] getAvgCompletionTime(){
 
-        Duration average = totalTimeCompletion.dividedBy(completedCount);
+        // calculates total time and divides by total completed count
+        totalTimeCompletion = highTimeCompletion.plus(mediumTimeCompletion).plus(lowTimeCompletion);
+        totalCompletedCount = highCompletedCount + mediumCompletedCount + lowCompletedCount;
+        String avgTotalTime = calculateMetrics(totalTimeCompletion, totalCompletedCount);
+
+        // calculates avg times for each priority
+        String avgHighTime = calculateMetrics(highTimeCompletion, highCompletedCount);
+        String avgMediumTime = calculateMetrics(mediumTimeCompletion, mediumCompletedCount);
+        String avgLowTime = calculateMetrics(lowTimeCompletion, lowCompletedCount);
+
+        // answers returned in an array
+        return new String[]{avgTotalTime, avgHighTime, avgMediumTime, avgLowTime};
+    }
+
+    // combined filter method
+    public List<Todo> getFilteredTodos(String queryFilter, int priorityFilter, int completedFilter){
+        List<Todo> filteredList = new ArrayList<>(originalList);
+
+        if (queryFilter != null && !queryFilter.isEmpty()) {
+            filteredList = filterByQuery(filteredList, queryFilter);
+        }
+
+        if (priorityFilter != 0) {
+            filteredList = filterByPriority(filteredList, priorityFilter);
+        }
+
+        if (completedFilter != 0) {
+            filteredList = filterByComplete(filteredList, completedFilter);
+        }
+
+
+        return filteredList;
+    }
+
+    //sorts todo objects by their due date and priority
+    public List<Todo> sortedTodos(List<Todo> list, Boolean ascending, Boolean sortByDuedate){
+        List<Todo> sortedList = new ArrayList<>(list);
+
+        Comparator<Todo> comparator = new Comparator<Todo>() {
+            @Override
+            public int compare(Todo item1, Todo item2) {
+                int result;
+
+                if (ascending == null && sortByDuedate == null) { return 0; }
+
+                // sorts by due date first, and then by priority
+                if (sortByDuedate) {
+
+                    result = sortByDueDate(item1, item2);
+                    if (result == 0) {
+                        result = sortByPriority(item1, item2);
+                    }
+                } else {
+                    // sorts by priority first, then by due date
+                    result = sortByPriority(item1, item2);
+                    if (result == 0) {
+                        result = sortByDueDate(item1, item2);
+                    }
+                }
+
+                if (ascending) { return result; }
+                else{
+                    return -result;
+                }
+            }
+        };
+
+        Collections.sort(sortedList, comparator);
+        return sortedList;
+    }
+
+    // paginates the list into only 10 items
+    public List<Todo> paginateTodos(List<Todo> list, int pageNumber){
+        if (list == null || list.isEmpty()) { return new ArrayList<>(); }
+
+        if (pageNumber < 1){ pageNumber = 1; }
+        int pageSize = 10;
+
+        int startIndex = (pageNumber - 1) * pageSize;
+
+        if (startIndex > list.size()){
+            return new ArrayList<>();
+        }
+
+        int endIndex = Math.min(startIndex + pageSize, list.size());
+
+        try {
+            return new ArrayList<>(list.subList(startIndex, endIndex));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // endregion *******
+
+    // region **** Helper Methods ****
+
+    // filters todo list by query
+    private List<Todo> filterByQuery(List<Todo> list, String query){
+        if(query == null || query.isEmpty()) return list;
+
+        List<Todo> queryList = new ArrayList<>();
+
+        String lowerCaseQuery = query.toLowerCase();
+        for (Todo todo: list){
+            if (todo.getTodoItem().toLowerCase().contains(lowerCaseQuery)) {
+                queryList.add(todo);
+            }
+        }
+        return queryList;
+    }
+
+    // filters todos list by priority
+    private List<Todo> filterByPriority(List<Todo> list, int priority){
+        List<Todo> priorityList = new ArrayList<>();
+
+        for (Todo todo: list){
+            if (todo.getPriority() == priority) {
+                priorityList.add(todo);
+            }
+        }
+        return priorityList;
+    }
+
+    // filters todo list by completed or not
+    // 1 = completed, 2 = uncompleted
+    private List<Todo> filterByComplete(List<Todo> list, int completed){
+        List<Todo> completedList = new ArrayList<>();
+
+        for (Todo todo: list){
+            int status = todo.isCompleted() ? 1 : 2;
+            if (status == completed){
+                completedList.add(todo);
+            }
+        }
+        return completedList;
+    }
+
+    // compares due dates of two items to sort them
+    private int sortByDueDate(Todo item1, Todo item2){
+        LocalDateTime date1 = item1.getDueDate();
+        LocalDateTime date2 = item2.getDueDate();
+
+        if (date1 == null && date2 == null) return 0;
+        else if (date1 == null) return 1;
+        else if (date2 == null) return -1;
+        else return date1.compareTo(date2);
+    }
+
+    // compares priority of two items to sort them
+    private int sortByPriority(Todo item1, Todo item2) {
+        return Integer.compare(item1.getPriority(), item2.getPriority());
+    }
+
+    //adds completed count and time to variables depending on todo item priority
+    private void addTimeToMetrics(int priority, Duration duration){
+        switch (priority) {
+            case 1:
+                highTimeCompletion = highTimeCompletion.plus(duration);
+                highCompletedCount++;
+                break;
+            case 2:
+                mediumTimeCompletion = mediumTimeCompletion.plus(duration);
+                mediumCompletedCount++;
+                break;
+            case 3:
+                lowTimeCompletion = lowTimeCompletion.plus(duration);
+                lowCompletedCount++;
+                break;
+            default:
+                break;
+        }
+    }
+
+    // removes completed count and time to variables depending on todo item priority
+    private void removeTimeFromMetrics(int priority, Duration duration){
+        switch (priority) {
+            case 1:
+                highTimeCompletion = highTimeCompletion.minus(duration);
+                highCompletedCount--;
+                break;
+            case 2:
+                mediumTimeCompletion = mediumTimeCompletion.minus(duration);
+                mediumCompletedCount--;
+                break;
+            case 3:
+                lowTimeCompletion = lowTimeCompletion.minus(duration);
+                lowCompletedCount--;
+                break;
+            default:
+                break;
+        }
+    }
+
+    // returns a string representation of avg completion time
+    private String calculateMetrics(Duration todoDuration, int todoCount){
+        if (todoCount == 0) return "N/A";
+
+        Duration average = todoDuration.dividedBy(todoCount);
         long days = average.toDays();
         long hours = average.toHoursPart();
         long minutes = average.toMinutesPart();
@@ -86,95 +288,20 @@ public class TodoService {
                               days, hours, minutes, seconds);
     }
 
-    //updates page with the current todo items
-    public List<Todo> updateList(String query, int priorityFilter, Boolean completed, boolean ascending){
-
-        //filters the list based on 3 parameters, and then sorts it
-        List<Todo> filteredList = filterTodos(query, priorityFilter, completed);
-        List<Todo> finalList = sortedTodos(filteredList, ascending);
-
-        return finalList;
-    }
-
-    // endregion *******
-
-    // region **** Helper Methods ****
-
-    //sorts todo objects by their due date
-    private List<Todo> sortedTodos(List<Todo> todos, boolean ascending){
-        List<Todo> sortedList = new ArrayList<>(todos);
-
-        Collections.sort(sortedList, new Comparator<Todo>() {
-            @Override
-            public int compare(Todo item1, Todo item2) {
-                LocalDateTime date1 = item1.getDueDate();
-                LocalDateTime date2 = item2.getDueDate();
-
-                if (date1 == null && date2 == null) return 0;
-                if (date1 == null) return 1;
-                if (date2 == null) return -1;
-
-                int result = date1.compareTo(date2);
-
-                if(!ascending) result = -result;
-
-                return result;
-            }
-        });
-        return sortedList;
-    }
-
-    //filters todo items based on query search, priority, and completed status
-    private List<Todo> filterTodos(String query, int priority, Boolean completed){
-        List<Todo> finalList = new ArrayList<>();
-
-        // adds todoItem to finalList based on filter options
-        for(Todo todoItem : todoItems.values()) {
-
-            //filters results by query search
-            if(query != null && !query.isEmpty()) {
-                String lowerCaseQuery = query.toLowerCase();
-                String lowerCaseTodoItem = todoItem.getTodoItem().toLowerCase();
-
-                if(!lowerCaseTodoItem.contains(lowerCaseQuery)) {
-                    continue;
-                }
-            }
-
-            // filters results by priority
-            if (priority != 0 && todoItem.getPriority() != priority) {
-                continue;
-            }
-
-            // filters results by completed, not completed, or all
-            if (completed != null && todoItem.isCompleted() != completed) {
-                continue;
-            }
-            finalList.add(todoItem);
-        }
-        return finalList;
-    }
-
-    // Must update this method to grab filter/sort state from the correct fields on the frontend
-    // grabs the parameters to properly filter and sort the list of todos
-    private void grabFilterSortState() {
-        String query = "";
-        int priorityFilter = 0;
-        Boolean completed = false;
-        boolean ascending = true;
-
-        updateList(query, priorityFilter, completed, ascending);
-    }
-
     // endregion ******
 
 
     // region **** TEST METHODS ****
 
-    public Duration getTotalTimeCompletion() { return totalTimeCompletion;}
+    public Duration getHighTimeCompletion() { return highTimeCompletion;}
+    public Duration getMediumTimeCompletion() { return mediumTimeCompletion;}
+    public Duration getLowTimeCompletion() { return lowTimeCompletion;}
 
-    public int getCompletedCount() { return completedCount;}
+    public int getHighCompletedCount() { return highCompletedCount;}
+    public int getMediumCompletedCount() { return mediumCompletedCount;}
+    public int getLowCompletedCount() { return lowCompletedCount;}
 
+    public List<Todo> getOriginalList() {return originalList;}
     public Map<UUID, Todo> getTodoMap() { return todoItems; }
 
 
